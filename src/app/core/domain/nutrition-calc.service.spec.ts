@@ -1,5 +1,9 @@
 import type { NutrientProfile } from '../models/nutrient-profile.model';
-import { aggregateTotals, computeNutrients } from './nutrition-calc.service';
+import {
+  aggregateTotals,
+  computeMacroDistribution,
+  computeNutrients,
+} from './nutrition-calc.service';
 
 describe('computeNutrients', () => {
   it('scales required fields by quantity_g / 100', () => {
@@ -108,5 +112,38 @@ describe('aggregateTotals', () => {
 
     expect(result.vitaminC_mg).toBe(40);
     expect(result.calcium_mg).toBeUndefined();
+  });
+});
+
+describe('computeMacroDistribution', () => {
+  it('expresses each macro as a % of totals.kcal using Atwater factors (4/4/9)', () => {
+    // protein: 25g * 4 = 100 kcal, carbs: 150g * 4 = 600 kcal, fat: 33.33g * 9 = 300 kcal
+    const totals: NutrientProfile = {
+      kcal: 1000,
+      protein_g: 25,
+      carbs_g: 150,
+      fat_g: 100 / 3,
+      fiber_g: 10,
+    };
+
+    const distribution = computeMacroDistribution(totals);
+
+    expect(distribution).toEqual([
+      { label: 'Protéines', percentOfKcal: 10 },
+      { label: 'Glucides', percentOfKcal: 60 },
+      { label: 'Lipides', percentOfKcal: 30 },
+    ]);
+  });
+
+  it('returns all zeros when totals.kcal is zero, avoiding a division by zero', () => {
+    const totals: NutrientProfile = { kcal: 0, protein_g: 0, carbs_g: 0, fat_g: 0, fiber_g: 0 };
+
+    const distribution = computeMacroDistribution(totals);
+
+    expect(distribution).toEqual([
+      { label: 'Protéines', percentOfKcal: 0 },
+      { label: 'Glucides', percentOfKcal: 0 },
+      { label: 'Lipides', percentOfKcal: 0 },
+    ]);
   });
 });

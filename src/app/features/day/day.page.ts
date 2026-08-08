@@ -15,6 +15,7 @@ import { DEFAULT_TARGETS } from '../../core/domain/targets';
 import type { Food } from '../../core/models/food.model';
 import type { FoodSearchSelection } from '../../core/models/food-search-selection.model';
 import { FoodSearchComponent } from '../food-search/food-search.component';
+import { MacroChartComponent } from './components/macro-chart/macro-chart.component';
 import { MealCardComponent } from './components/meal-card/meal-card.component';
 import { NutrientSummaryTableComponent } from './components/nutrient-summary-table/nutrient-summary-table.component';
 
@@ -39,6 +40,7 @@ function shiftDate(date: string, days: number): string {
     MealCardComponent,
     FoodSearchComponent,
     NutrientSummaryTableComponent,
+    MacroChartComponent,
   ],
   templateUrl: './day.page.html',
   styleUrl: './day.page.css',
