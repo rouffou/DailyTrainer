@@ -12,19 +12,6 @@
     "format:check": "prettier --check \"src/**/*.{ts,html,css}\"",
     "prepare": "husky"
   },
-  "lint-staged": {
-    "src/**/*.ts": [
-      "eslint --fix",
-      "prettier --write",
-      "ng test --watch=false --pass-with-no-tests --find-related-tests"
-    ],
-    "src/**/*.html": [
-      "prettier --write"
-    ],
-    "*.{css,scss,json,md}": [
-      "prettier --write"
-    ]
-  },
   "private": true,
   "packageManager": "npm@11.6.1",
   "dependencies": {
