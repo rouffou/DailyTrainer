@@ -28,7 +28,7 @@ const MICRO_METADATA: ReadonlyArray<{ key: keyof NutrientProfile; label: string;
   { key: 'vitaminA_mcg', label: 'Vitamine A', unit: 'µg' },
   { key: 'vitaminC_mg', label: 'Vitamine C', unit: 'mg' },
   { key: 'vitaminD_mcg', label: 'Vitamine D', unit: 'µg' },
-  { key: 'vitaminB12_mcg', label: 'Vitamine B12', unit: 'µg' },
+  { key: 'vitaminB12_mcg', label: 'Vitamine B12', unit: 'µg' }, // gitleaks:allow — nutrient key, not a secret
   { key: 'calcium_mg', label: 'Calcium', unit: 'mg' },
   { key: 'iron_mg', label: 'Fer', unit: 'mg' },
   { key: 'magnesium_mg', label: 'Magnésium', unit: 'mg' },
