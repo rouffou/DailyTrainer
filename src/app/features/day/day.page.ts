@@ -17,6 +17,7 @@ import type { FoodSearchSelection } from '../../core/models/food-search-selectio
 import { FoodSearchComponent } from '../food-search/food-search.component';
 import { MacroChartComponent } from './components/macro-chart/macro-chart.component';
 import { MealCardComponent } from './components/meal-card/meal-card.component';
+import { MicronutrientChartComponent } from './components/micronutrient-chart/micronutrient-chart.component';
 import { NutrientSummaryTableComponent } from './components/nutrient-summary-table/nutrient-summary-table.component';
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
@@ -41,6 +42,7 @@ function shiftDate(date: string, days: number): string {
     FoodSearchComponent,
     NutrientSummaryTableComponent,
     MacroChartComponent,
+    MicronutrientChartComponent,
   ],
   templateUrl: './day.page.html',
   styleUrl: './day.page.css',
