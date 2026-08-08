@@ -1,5 +1,6 @@
 import type { Food } from '../models/food.model';
-import { computeNutrients } from './nutrition-calc.service';
+import type { NutrientProfile } from '../models/nutrient-profile.model';
+import { aggregateTotals, computeNutrients } from './nutrition-calc.service';
 
 function makeFood(per100g: Food['per100g']): Food {
   return {
@@ -55,6 +56,69 @@ describe('computeNutrients', () => {
     expect(result.vitaminC_mg).toBe(40);
     expect(result.iron_mg).toBe(1);
     expect(result.sodium_mg).toBeUndefined();
+    expect(result.calcium_mg).toBeUndefined();
+  });
+});
+
+describe('aggregateTotals', () => {
+  it('returns all-zero required fields for an empty list', () => {
+    expect(aggregateTotals([])).toEqual({
+      kcal: 0,
+      protein_g: 0,
+      carbs_g: 0,
+      fat_g: 0,
+      fiber_g: 0,
+    });
+  });
+
+  it('sums required fields across profiles', () => {
+    const a: NutrientProfile = { kcal: 100, protein_g: 10, carbs_g: 5, fat_g: 2, fiber_g: 1 };
+    const b: NutrientProfile = { kcal: 50, protein_g: 5, carbs_g: 2, fat_g: 1, fiber_g: 0.5 };
+
+    expect(aggregateTotals([a, b])).toEqual({
+      kcal: 150,
+      protein_g: 15,
+      carbs_g: 7,
+      fat_g: 3,
+      fiber_g: 1.5,
+    });
+  });
+
+  it('returns a single profile unchanged', () => {
+    const profile: NutrientProfile = {
+      kcal: 100,
+      protein_g: 10,
+      carbs_g: 5,
+      fat_g: 2,
+      fiber_g: 1,
+      vitaminC_mg: 80,
+    };
+
+    expect(aggregateTotals([profile])).toEqual(profile);
+  });
+
+  it('sums an optional micronutrient only present on some profiles, and omits ones present on none', () => {
+    const a: NutrientProfile = {
+      kcal: 100,
+      protein_g: 10,
+      carbs_g: 5,
+      fat_g: 2,
+      fiber_g: 1,
+      vitaminC_mg: 30,
+    };
+    const b: NutrientProfile = { kcal: 50, protein_g: 5, carbs_g: 2, fat_g: 1, fiber_g: 0.5 };
+    const c: NutrientProfile = {
+      kcal: 20,
+      protein_g: 2,
+      carbs_g: 1,
+      fat_g: 0,
+      fiber_g: 0,
+      vitaminC_mg: 10,
+    };
+
+    const result = aggregateTotals([a, b, c]);
+
+    expect(result.vitaminC_mg).toBe(40);
     expect(result.calcium_mg).toBeUndefined();
   });
 });
