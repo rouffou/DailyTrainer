@@ -6,6 +6,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { switchMap } from 'rxjs';
 
 import { DailyLogRepository } from '../../core/data-access/daily-log.repository';
+import { KcalProteinChartComponent } from './components/kcal-protein-chart/kcal-protein-chart.component';
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 const DEFAULT_RANGE_DAYS = 6;
@@ -20,7 +21,7 @@ function daysAgo(days: number): string {
 
 @Component({
   selector: 'dt-history-page',
-  imports: [MatToolbarModule, MatFormFieldModule, MatInputModule],
+  imports: [MatToolbarModule, MatFormFieldModule, MatInputModule, KcalProteinChartComponent],
   templateUrl: './history.page.html',
   styleUrl: './history.page.css',
 })

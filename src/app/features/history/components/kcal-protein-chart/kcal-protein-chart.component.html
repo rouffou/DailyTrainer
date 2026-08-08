@@ -1,0 +1,17 @@
+@if (hasData()) {
+  <div class="chart-container">
+    <ngx-charts-line-chart
+      [view]="[600, 300]"
+      [results]="series()"
+      [scheme]="scheme"
+      [xAxis]="true"
+      [yAxis]="true"
+      [legend]="true"
+      [autoScale]="true"
+      [timeline]="false"
+      [animations]="false"
+    />
+  </div>
+} @else {
+  <p class="empty-state">Aucune donnée pour cette période.</p>
+}
