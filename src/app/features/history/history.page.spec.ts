@@ -1,5 +1,6 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
 
 import { DailyLogRepository } from '../../core/data-access/daily-log.repository';
@@ -17,6 +18,7 @@ describe('HistoryPage', () => {
       imports: [HistoryPage],
       providers: [
         provideZonelessChangeDetection(),
+        provideNoopAnimations(),
         { provide: DailyLogRepository, useValue: dailyLogRepository },
       ],
     }).compileComponents();
