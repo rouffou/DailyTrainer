@@ -1,0 +1,28 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>{{ meal().label }}</mat-card-title>
+    <mat-card-subtitle>{{ meal().totals.kcal }} kcal</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <mat-list>
+      @for (item of meal().items; track item.id) {
+        <mat-list-item>
+          <span matListItemTitle>{{ item.foodName }}</span>
+          <span matListItemLine>{{ item.quantity_g }} g — {{ item.computed.kcal }} kcal</span>
+          <button
+            matListItemMeta
+            mat-icon-button
+            type="button"
+            [attr.aria-label]="'Supprimer ' + item.foodName"
+            (click)="onDeleteItem(item.id)"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-list-item>
+      } @empty {
+        <p class="empty-state">Aucun aliment ajouté.</p>
+      }
+    </mat-list>
+  </mat-card-content>
+</mat-card>
