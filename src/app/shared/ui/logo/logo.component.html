@@ -1,0 +1,20 @@
+<span
+  class="logo"
+  [attr.role]="variant() === 'mark' ? 'img' : null"
+  [attr.aria-label]="variant() === 'mark' ? 'DailyTrainer' : null"
+>
+  <svg class="logo__mark" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <circle cx="12" cy="12" r="12" class="logo__mark-fill" />
+    <path
+      d="M7 12.5l3 3 7-7"
+      class="logo__mark-check"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      fill="none"
+    />
+  </svg>
+  @if (variant() === 'full') {
+    <span class="logo__wordmark">DailyTrainer</span>
+  }
+</span>

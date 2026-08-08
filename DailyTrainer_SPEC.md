@@ -1,4 +1,5 @@
 # DailyTrainer — Spécification technique
+
 ## Calculateur nutritionnel automatique (kcal, macro & micronutriments)
 
 > Adapté pour la stack **Angular + Firebase**.
@@ -8,6 +9,7 @@
 ## 1. Objectif du projet
 
 Application web permettant de :
+
 - Saisir rapidement les aliments consommés dans la journée (par repas)
 - Calculer automatiquement les calories, macronutriments (protéines, glucides, lipides, fibres) et micronutriments (vitamines, minéraux) de chaque aliment et de chaque repas
 - Agréger ces données sur une journée complète et les comparer à des repères journaliers (AJR)
@@ -19,15 +21,15 @@ Cas d'usage type : l'utilisateur note "100g bacon, 500g crudités (tomates ceris
 
 ## 2. Stack technique
 
-| Couche | Choix | Justification |
-|---|---|---|
-| Frontend | **Angular** (Angular CLI, TypeScript, standalone components) | Typage fort natif pour les modèles nutritionnels, structure en modules bien adaptée à une app avec plusieurs écrans (Journée, Historique, Recherche), RxJS pratique pour les flux Firestore en temps réel |
-| Backend | **Firebase Cloud Functions** (Node.js + TypeScript, callable functions ou HTTPS) | Sert uniquement à ce que le client ne doit pas faire directement : appeler USDA/Open Food Facts avec une clé API secrète, et pré-calculer/agréger si besoin. Pas de serveur à gérer, déploiement intégré à Firebase |
-| Base de données | **Cloud Firestore** | Base NoSQL managée, synchronisation temps réel avec le front Angular (`@angular/fire`), persistance offline native (cache local automatique côté client), pas de serveur DB à gérer, scalable si usage multi-utilisateur plus tard |
-| Authentification | **Firebase Authentication** (email/mdp ou Google, activable dès la V1 même en mono-utilisateur) | Recommandé dès le départ : permet d'associer les données Firestore à un `uid` et sécuriser l'accès via les règles Firestore, sans effort de mise en place supplémentaire |
-| Hébergement | **Firebase Hosting** | Déploiement direct du build Angular (`ng build` → `firebase deploy`), CDN inclus, HTTPS automatique |
-| API nutrition externe | **Open Food Facts** (gratuite, sans clé, base collaborative, bonne couverture produits emballés/marques comme Aldi) en complément **USDA FoodData Central** (gratuite avec clé API, fiable pour aliments bruts/génériques) | Combine couverture produits de marque (OFF) + fiabilité nutritionnelle sur aliments génériques (USDA). Les deux sont appelées **depuis une Cloud Function**, jamais directement depuis le navigateur, pour ne pas exposer la clé USDA |
-| Graphiques | **ngx-charts** (ou **Chart.js** via `ng2-charts`) | Librairies Angular-natives pour barres/radar, équivalent de Recharts côté React |
+| Couche                | Choix                                                                                                                                                                                                                      | Justification                                                                                                                                                                                                                                                       |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Frontend              | **Angular** (Angular CLI, TypeScript, standalone components)                                                                                                                                                               | Typage fort natif pour les modèles nutritionnels, structure en modules bien adaptée à une app avec plusieurs écrans (Journée, Historique, Recherche), RxJS pratique pour les flux Firestore en temps réel                                                           |
+| Backend               | **Firebase Cloud Functions** (Node.js + TypeScript, callable functions ou HTTPS)                                                                                                                                           | Sert uniquement à ce que le client ne doit pas faire directement : appeler USDA/Open Food Facts avec une clé API secrète, et pré-calculer/agréger si besoin. Pas de serveur à gérer, déploiement intégré à Firebase                                                 |
+| Base de données       | **Cloud Firestore**                                                                                                                                                                                                        | Base NoSQL managée, synchronisation temps réel avec le front Angular (`@angular/fire`), persistance offline native (cache local automatique côté client), pas de serveur DB à gérer, scalable si usage multi-utilisateur plus tard                                  |
+| Authentification      | **Firebase Authentication** — email/mdp + **connexion sociale Google et Facebook**, activable dès la V1 même en mono-utilisateur                                                                                           | Recommandé dès le départ : permet d'associer les données Firestore à un `uid` et sécuriser l'accès via les règles Firestore, sans effort de mise en place supplémentaire. Google/Facebook réduisent la friction d'inscription (pas de mot de passe à créer/retenir) |
+| Hébergement           | **Firebase Hosting**                                                                                                                                                                                                       | Déploiement direct du build Angular (`ng build` → `firebase deploy`), CDN inclus, HTTPS automatique                                                                                                                                                                 |
+| API nutrition externe | **Open Food Facts** (gratuite, sans clé, base collaborative, bonne couverture produits emballés/marques comme Aldi) en complément **USDA FoodData Central** (gratuite avec clé API, fiable pour aliments bruts/génériques) | Combine couverture produits de marque (OFF) + fiabilité nutritionnelle sur aliments génériques (USDA). Les deux sont appelées **depuis une Cloud Function**, jamais directement depuis le navigateur, pour ne pas exposer la clé USDA                               |
+| Graphiques            | **ngx-charts** (ou **Chart.js** via `ng2-charts`)                                                                                                                                                                          | Librairies Angular-natives pour barres/radar, équivalent de Recharts côté React                                                                                                                                                                                     |
 
 > Pas de Prisma / SQLite / Express dans cette version : Firestore remplace à la fois la base de données et une bonne partie de la couche API (lecture/écriture directes depuis Angular via le SDK, sécurisées par des règles Firestore). Les Cloud Functions ne portent que la logique qui doit rester côté serveur (clés API, agrégations lourdes, tâches planifiées).
 
@@ -93,36 +95,36 @@ interface NutrientProfile {
 }
 
 interface Food {
-  id: string;                 // = id du document Firestore
-  name: string;                // "Bacon Aldi", "Carotte râpée"
+  id: string; // = id du document Firestore
+  name: string; // "Bacon Aldi", "Carotte râpée"
   source: 'local' | 'openfoodfacts' | 'usda';
-  sourceId?: string;           // code-barres OFF, fdcId USDA
-  per100g: NutrientProfile;    // valeurs pour 100g/100ml de référence
+  sourceId?: string; // code-barres OFF, fdcId USDA
+  per100g: NutrientProfile; // valeurs pour 100g/100ml de référence
   createdAt: Timestamp;
-  ownerUid?: string;           // uid si correction manuelle propre à l'utilisateur
+  ownerUid?: string; // uid si correction manuelle propre à l'utilisateur
 }
 
 interface MealItem {
   id: string;
   foodId: string;
-  foodName: string;            // dénormalisé pour affichage sans jointure
+  foodName: string; // dénormalisé pour affichage sans jointure
   quantity_g: number;
-  computed: NutrientProfile;   // per100g * (quantity_g / 100), calculé à l'ajout
+  computed: NutrientProfile; // per100g * (quantity_g / 100), calculé à l'ajout
 }
 
 interface Meal {
   id: string;
-  label: string;               // "Repas de midi", "Collation 16h"
-  items: MealItem[];           // sous-collection ou tableau embarqué (voir 4.2)
-  totals: NutrientProfile;     // somme des items, calculé
+  label: string; // "Repas de midi", "Collation 16h"
+  items: MealItem[]; // sous-collection ou tableau embarqué (voir 4.2)
+  totals: NutrientProfile; // somme des items, calculé
 }
 
 interface DailyLog {
-  id: string;                  // = date "2026-08-08"
+  id: string; // = date "2026-08-08"
   date: string;
   meals: Meal[];
-  totals: NutrientProfile;     // somme de tous les repas
-  targets?: NutrientProfile;   // objectifs journaliers (AJR ou personnalisés)
+  totals: NutrientProfile; // somme de tous les repas
+  targets?: NutrientProfile; // objectifs journaliers (AJR ou personnalisés)
 }
 ```
 
@@ -169,6 +171,7 @@ service cloud.firestore {
 Entrée utilisateur type : `"100gr de bacon aldi"`
 
 Pipeline de résolution :
+
 1. **Parsing** (côté Angular, service pur, testable) : extraire `{ quantity: 100, unit: 'g', name: 'bacon aldi' }` (regex simple sur `\d+\s*(g|gr|kg|ml|cl|cas|cac|unité)?\s*(de|d')?\s*(.+)`)
 2. **Recherche locale** : requête Firestore sur `users/{uid}/foods` (nom similaire) — évite de re-taper "bacon aldi" à chaque fois et garantit la cohérence avec les repas précédents. Firestore ne supportant pas la recherche plein texte nativement, utiliser soit un filtre `where('name', '>=', ...) / ('name', '<=', ...)` sur préfixe, soit une intégration légère (ex. Algolia via extension Firebase) si la recherche approximative devient un besoin fort
 3. **Si absent → appel à une Cloud Function `searchFood`** (callable, `functions/src/foodSearch.ts`) qui, côté serveur :
@@ -219,23 +222,24 @@ const DEFAULT_TARGETS: NutrientProfile = {
 
 Avec Firestore, la majorité des opérations CRUD se font **directement depuis Angular via le SDK** (`@angular/fire/firestore`), sécurisées par les règles Firestore — pas besoin d'endpoints REST dédiés. Seules les opérations nécessitant une clé secrète ou une logique serveur passent par des Cloud Functions.
 
-| Opération | Mécanisme |
-|---|---|
-| Rechercher un aliment (cache local) | Requête Firestore directe : `collection(users/{uid}/foods)` avec filtre sur `name` |
-| Rechercher un aliment (API externe) | Cloud Function callable `searchFood({ query })` → OFF/USDA, ne touche pas Firestore directement |
-| Enregistrer un aliment résolu | `setDoc`/`addDoc` Firestore direct dans `users/{uid}/foods` |
-| Récupérer le DailyLog d'une date | `getDoc(users/{uid}/dailyLogs/{date})` + `getDocs` sur les sous-collections `meals`/`items` (ou `onSnapshot` pour du temps réel) |
-| Créer un repas | `addDoc`/`setDoc` Firestore direct dans `.../dailyLogs/{date}/meals` |
-| Ajouter un item à un repas | `addDoc` Firestore direct dans `.../meals/{mealId}/items`, déclenche recalcul des totals (trigger ou service client) |
-| Supprimer un item | `deleteDoc` Firestore direct |
-| Résumé + % AJR | Calculé côté client (service Angular) à partir des `totals` déjà en cache local Firestore, pas d'appel réseau nécessaire |
-| Historique sur une période | Requête Firestore `where('date', '>=', from).where('date', '<=', to)` sur `dailyLogs`, triée pour les graphiques d'évolution |
+| Opération                           | Mécanisme                                                                                                                        |
+| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Rechercher un aliment (cache local) | Requête Firestore directe : `collection(users/{uid}/foods)` avec filtre sur `name`                                               |
+| Rechercher un aliment (API externe) | Cloud Function callable `searchFood({ query })` → OFF/USDA, ne touche pas Firestore directement                                  |
+| Enregistrer un aliment résolu       | `setDoc`/`addDoc` Firestore direct dans `users/{uid}/foods`                                                                      |
+| Récupérer le DailyLog d'une date    | `getDoc(users/{uid}/dailyLogs/{date})` + `getDocs` sur les sous-collections `meals`/`items` (ou `onSnapshot` pour du temps réel) |
+| Créer un repas                      | `addDoc`/`setDoc` Firestore direct dans `.../dailyLogs/{date}/meals`                                                             |
+| Ajouter un item à un repas          | `addDoc` Firestore direct dans `.../meals/{mealId}/items`, déclenche recalcul des totals (trigger ou service client)             |
+| Supprimer un item                   | `deleteDoc` Firestore direct                                                                                                     |
+| Résumé + % AJR                      | Calculé côté client (service Angular) à partir des `totals` déjà en cache local Firestore, pas d'appel réseau nécessaire         |
+| Historique sur une période          | Requête Firestore `where('date', '>=', from).where('date', '<=', to)` sur `dailyLogs`, triée pour les graphiques d'évolution     |
 
 ---
 
 ## 7. Interface utilisateur (V1 minimaliste)
 
 ### Écran principal — "Ma journée" (`features/day`)
+
 - Sélecteur de date (par défaut : aujourd'hui)
 - Un bloc par repas ("Repas de midi", "+ Ajouter un repas")
 - Dans chaque bloc : liste des aliments saisis avec quantité, kcal, et bouton supprimer
@@ -246,6 +250,7 @@ Avec Firestore, la majorité des opérations CRUD se font **directement depuis A
 - Données synchronisées en temps réel via `onSnapshot` (utile si utilisation multi-appareils, ex. saisie sur mobile puis consultation sur desktop)
 
 ### Écran "Historique" (`features/history`)
+
 - Courbe d'évolution des kcal/protéines sur 7/30 jours, alimentée par la requête Firestore sur `dailyLogs`
 
 ---
@@ -253,17 +258,18 @@ Avec Firestore, la majorité des opérations CRUD se font **directement depuis A
 ## 8. Plan de développement suggéré (par étapes)
 
 1. **Setup projet** : `ng new dailytrainer`, `firebase init` (Hosting, Firestore, Functions, Auth), installer `@angular/fire`
-2. **Modèle de données** : définir les interfaces TS dans `core/models`, écrire `firestore.rules` et `firestore.indexes.json`
-3. **Auth** : activer Firebase Authentication (email/mdp suffit en V1), guard Angular sur les routes protégées
-4. **Service de calcul** : `NutritionCalcService` — fonctions pures `computeNutrients(food, quantity_g) → NutrientProfile` et `aggregateTotals(items) → NutrientProfile` (faciles à tester unitairement, aucune dépendance externe/Firebase)
-5. **Cloud Function `searchFood`** : clients `openFoodFactsClient.ts` et `usdaClient.ts`, clé USDA en config Functions (`firebase functions:secrets:set`), cache écrit dans Firestore après première résolution
-6. **Services Firestore** : `FoodService`, `DailyLogService`, `MealService` (wrapper autour de `@angular/fire/firestore`)
-7. **UI de saisie** : formulaire + autocomplete (`features/food-search`)
-8. **UI récapitulatif** : tableaux + graphiques ngx-charts (reprendre le format des tableaux qu'on a utilisés dans cette conversation comme référence visuelle)
-9. **AJR & % objectifs**
-10. **Historique**
-11. **Déploiement** : `ng build && firebase deploy`
-12. *(Bonus V2)* : reconnaissance vocale/texte libre plus poussée (NLP léger) pour parser des phrases comme "100gr de bacon aldi, 500gr de crudités..." en plusieurs lignes d'un coup
+2. **Charte graphique** : implémenter les tokens de `DailyTrainer_CHARTE_GRAPHIQUE.md` en variables CSS globales (`--dt-primary-*`, `--dt-accent-*`, couleurs sémantiques macros/statuts AJR, spacing, radius), charger la police Inter, intégrer le logo (wordmark + mark), configurer les composants de base (boutons, badges, cartes) avant toute feature pour éviter le style ad hoc écran par écran
+3. **Modèle de données** : définir les interfaces TS dans `core/models`, écrire `firestore.rules` et `firestore.indexes.json`
+4. **Auth** : activer Firebase Authentication — email/mdp, **puis providers OAuth Google et Facebook** (config des providers dans la console Firebase + écran de login avec boutons "Continuer avec Google" / "Continuer avec Facebook", pour Facebook : créer une app sur developers.facebook.com et renseigner App ID/Secret côté Firebase), guard Angular sur les routes protégées
+5. **Service de calcul** : `NutritionCalcService` — fonctions pures `computeNutrients(food, quantity_g) → NutrientProfile` et `aggregateTotals(items) → NutrientProfile` (faciles à tester unitairement, aucune dépendance externe/Firebase)
+6. **Cloud Function `searchFood`** : clients `openFoodFactsClient.ts` et `usdaClient.ts`, clé USDA en config Functions (`firebase functions:secrets:set`), cache écrit dans Firestore après première résolution
+7. **Services Firestore** : `FoodService`, `DailyLogService`, `MealService` (wrapper autour de `@angular/fire/firestore`)
+8. **UI de saisie** : formulaire + autocomplete (`features/food-search`)
+9. **UI récapitulatif** : tableaux + graphiques ngx-charts (reprendre le format des tableaux qu'on a utilisés dans cette conversation comme référence visuelle)
+10. **AJR & % objectifs**
+11. **Historique**
+12. **Déploiement** : `ng build && firebase deploy`
+13. _(Bonus V2)_ : reconnaissance vocale/texte libre plus poussée (NLP léger) pour parser des phrases comme "100gr de bacon aldi, 500gr de crudités..." en plusieurs lignes d'un coup
 
 ---
 
@@ -288,5 +294,6 @@ Avec Firestore, la majorité des opérations CRUD se font **directement depuis A
 ## 11. Prochaines étapes concrètes
 
 Une fois ce document dans le repo `DailyTrainer`, tu peux :
+
 - Le donner tel quel à un assistant de code avec l'instruction "implémente ce projet selon cette spec, en commençant par l'étape 1 du plan de développement"
 - Ajuster les détails (ex: Auth Google plutôt qu'email/mdp, ngx-charts plutôt que Chart.js) selon tes préférences
