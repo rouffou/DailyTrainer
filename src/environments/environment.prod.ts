@@ -4,11 +4,11 @@ import type { Environment } from './environment.model';
 export const environment: Environment = {
   production: true,
   firebase: {
-    apiKey: 'REPLACE_WITH_PROD_API_KEY',
+    apiKey: 'AIzaSyAozVaVtSK2REKJfw50VAt1GhBU8gvRgvA',
     authDomain: 'dailytrainer-prod.firebaseapp.com',
     projectId: 'dailytrainer-prod',
-    storageBucket: 'dailytrainer-prod.appspot.com',
-    messagingSenderId: 'REPLACE_WITH_PROD_SENDER_ID',
-    appId: 'REPLACE_WITH_PROD_APP_ID',
+    storageBucket: 'dailytrainer-prod.firebasestorage.app',
+    messagingSenderId: '733035227887',
+    appId: '1:733035227887:web:20e980f7b70b3c8101091a',
   },
 };
