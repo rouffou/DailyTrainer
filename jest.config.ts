@@ -5,10 +5,16 @@ const config: Config = {
   setupFilesAfterEnv: ['<rootDir>/setup-jest.ts'],
   // firestore-tests/ and functions/ have their own separate Jest configs (Node, not jsdom;
   // no Angular TestBed) and must not be picked up by this one.
-  roots: ['<rootDir>/src']
-  // coverageThreshold on ./src/app/core/domain (100%, per STANDARDS.md section 5) is added
-  // in issue #13 once the first file lands there — an empty-folder threshold fails Jest outright
-  // ("Coverage data ... was not found"), so it can't be enabled before there's anything to cover.
+  roots: ['<rootDir>/src'],
+  // 100% coverage on core/domain, per STANDARDS.md section 5.
+  coverageThreshold: {
+    './src/app/core/domain/**/*.ts': {
+      branches: 100,
+      functions: 100,
+      lines: 100,
+      statements: 100
+    }
+  }
 };
 
 export default config;
