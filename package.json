@@ -9,7 +9,21 @@
     "test": "ng test",
     "lint": "eslint .",
     "format": "prettier --write \"src/**/*.{ts,html,css}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,html,css}\""
+    "format:check": "prettier --check \"src/**/*.{ts,html,css}\"",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "src/**/*.ts": [
+      "eslint --fix",
+      "prettier --write",
+      "jest --bail --passWithNoTests --findRelatedTests"
+    ],
+    "src/**/*.html": [
+      "prettier --write"
+    ],
+    "*.{css,scss,json,md}": [
+      "prettier --write"
+    ]
   },
   "private": true,
   "packageManager": "npm@11.6.1",
@@ -30,6 +44,8 @@
     "@angular/build": "^22.0.0",
     "@angular/cli": "^22.0.0",
     "@angular/compiler-cli": "^22.0.0",
+    "@commitlint/cli": "^21.2.1",
+    "@commitlint/config-conventional": "^21.2.0",
     "@eslint/js": "^10.0.1",
     "@types/jest": "^30.0.0",
     "angular-eslint": "^22.1.0",
@@ -37,9 +53,11 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.5",
     "eslint-plugin-boundaries": "^7.1.0",
+    "husky": "^9.1.7",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
     "jest-preset-angular": "^17.0.0",
+    "lint-staged": "^17.3.0",
     "prettier": "^3.8.1",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.66.0"
