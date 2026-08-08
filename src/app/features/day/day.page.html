@@ -1,0 +1,28 @@
+<mat-toolbar color="primary">
+  <button mat-icon-button (click)="goToPreviousDay()" aria-label="Jour précédent">
+    <mat-icon>chevron_left</mat-icon>
+  </button>
+
+  <input class="date-input" type="date" [value]="selectedDate()" (change)="onDateInput($event)" />
+
+  <button mat-icon-button (click)="goToNextDay()" aria-label="Jour suivant">
+    <mat-icon>chevron_right</mat-icon>
+  </button>
+
+  <button mat-icon-button (click)="goToToday()" aria-label="Aujourd'hui">
+    <mat-icon>today</mat-icon>
+  </button>
+</mat-toolbar>
+
+@if (dailyLog(); as log) {
+  <mat-nav-list>
+    @for (meal of log.meals; track meal.id) {
+      <mat-list-item>
+        <span matListItemTitle>{{ meal.label }}</span>
+        <span matListItemLine>{{ meal.totals.kcal }} kcal</span>
+      </mat-list-item>
+    }
+  </mat-nav-list>
+} @else {
+  <p class="empty-state">Aucune donnée pour cette journée.</p>
+}
