@@ -1,0 +1,36 @@
+<mat-toolbar color="primary">
+  <button mat-icon-button (click)="goToPreviousDay()" aria-label="Jour précédent">
+    <mat-icon>chevron_left</mat-icon>
+  </button>
+
+  <input class="date-input" type="date" [value]="selectedDate()" (change)="onDateInput($event)" />
+
+  <button mat-icon-button (click)="goToNextDay()" aria-label="Jour suivant">
+    <mat-icon>chevron_right</mat-icon>
+  </button>
+
+  <button mat-icon-button (click)="goToToday()" aria-label="Aujourd'hui">
+    <mat-icon>today</mat-icon>
+  </button>
+</mat-toolbar>
+
+<section class="meals">
+  @if (dailyLog(); as log) {
+    @for (meal of log.meals; track meal.id) {
+      <article class="meal">
+        <dt-meal-card [meal]="meal" (deleteItem)="onDeleteItem(meal.id, $event)" />
+        <dt-food-search (foodSelected)="onFoodSelected(meal.id, $event)" />
+      </article>
+    } @empty {
+      <p class="empty-state">Aucun repas pour cette journée.</p>
+    }
+  }
+
+  <form class="new-meal" (submit)="$event.preventDefault(); onCreateMeal()">
+    <mat-form-field appearance="outline">
+      <mat-label>Nouveau repas</mat-label>
+      <input matInput [value]="newMealLabel()" (input)="onNewMealLabelInput($event)" />
+    </mat-form-field>
+    <button mat-flat-button type="submit">Ajouter un repas</button>
+  </form>
+</section>

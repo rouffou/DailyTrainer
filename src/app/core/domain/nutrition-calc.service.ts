@@ -1,12 +1,14 @@
-import type { Food } from '../models/food.model';
 import type { NutrientProfile } from '../models/nutrient-profile.model';
 
-export function computeNutrients(food: Food, quantityG: number): NutrientProfile {
+// Takes per100g directly rather than a whole Food: the only thing this ever needed was that one
+// field, and requiring a full Food (id, name, source, createdAt...) just to scale some numbers
+// made every caller assemble or fake fields it had no use for (see #27's add-item flow).
+export function computeNutrients(per100g: NutrientProfile, quantityG: number): NutrientProfile {
   const factor = quantityG / 100;
 
-  // Object.entries loses the precise key type; food.per100g is already a well-formed
-  // NutrientProfile, so restoring it here is safe — every key really is one of its keys.
-  const entries = Object.entries(food.per100g) as Array<[keyof NutrientProfile, number]>;
+  // Object.entries loses the precise key type; per100g is already a well-formed NutrientProfile,
+  // so restoring it here is safe — every key really is one of its keys.
+  const entries = Object.entries(per100g) as Array<[keyof NutrientProfile, number]>;
   const scaledEntries = entries.map(([key, value]) => [key, value * factor] as const);
 
   // Object.fromEntries only knows it built a Record<string, number>, not that every required
