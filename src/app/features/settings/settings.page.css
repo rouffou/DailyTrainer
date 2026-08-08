@@ -1,0 +1,29 @@
+mat-toolbar {
+  display: flex;
+  justify-content: center;
+}
+
+.settings-card {
+  max-width: 32rem;
+  margin: 1rem auto;
+}
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.sex-group {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.error-message {
+  color: #b3261e;
+}
+
+.success-message {
+  color: #2e7d32;
+}

@@ -1,0 +1,75 @@
+<mat-toolbar color="primary">
+  <span>Paramètres</span>
+</mat-toolbar>
+
+<mat-card class="settings-card">
+  <mat-card-header>
+    <mat-card-title>Objectifs personnalisés</mat-card-title>
+    <mat-card-subtitle>Calculés avec la formule de Mifflin-St Jeor (BMR/TDEE)</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <form class="settings-form" (submit)="$event.preventDefault(); onSubmit()">
+      <mat-radio-group
+        class="sex-group"
+        aria-label="Sexe"
+        [value]="sex()"
+        (change)="sex.set($event.value)"
+      >
+        <mat-radio-button value="female">Femme</mat-radio-button>
+        <mat-radio-button value="male">Homme</mat-radio-button>
+      </mat-radio-group>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Âge</mat-label>
+        <input matInput type="number" min="0" [value]="age()" (input)="onAgeInput($event)" />
+        <span matTextSuffix>ans</span>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Poids</mat-label>
+        <input
+          matInput
+          type="number"
+          min="0"
+          [value]="weightKg()"
+          (input)="onWeightInput($event)"
+        />
+        <span matTextSuffix>kg</span>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Taille</mat-label>
+        <input
+          matInput
+          type="number"
+          min="0"
+          [value]="heightCm()"
+          (input)="onHeightInput($event)"
+        />
+        <span matTextSuffix>cm</span>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Niveau d'activité</mat-label>
+        <mat-select [value]="activityLevel()" (selectionChange)="activityLevel.set($event.value)">
+          @for (option of activityLevelOptions; track option.value) {
+            <mat-option [value]="option.value">{{ option.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      @if (errorMessage(); as message) {
+        <p class="error-message" role="alert">{{ message }}</p>
+      }
+
+      @if (savedTargetsKcal(); as kcal) {
+        <p class="success-message">Objectifs enregistrés : {{ kcal }} kcal / jour.</p>
+      }
+
+      <button mat-flat-button type="submit" [disabled]="isSubmitting()">
+        Enregistrer mes objectifs
+      </button>
+    </form>
+  </mat-card-content>
+</mat-card>

@@ -51,7 +51,7 @@ export class DailyLogRepository {
 
   async upsert(
     date: string,
-    fields: { totals: NutrientProfile; targets?: NutrientProfile },
+    fields: { totals?: NutrientProfile; targets?: NutrientProfile },
   ): Promise<Result<void>> {
     const uid = this.requireUid();
     try {

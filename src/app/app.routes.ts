@@ -21,4 +21,9 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./features/day/day.page').then((m) => m.DayPage),
   },
+  {
+    path: 'settings',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/settings/settings.page').then((m) => m.SettingsPage),
+  },
 ];
