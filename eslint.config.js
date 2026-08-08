@@ -68,6 +68,14 @@ module.exports = tseslint.config(
                 to: { element: { type: 'features', captured: { feature: '{{from.feature}}' } } },
               },
             },
+            // food-search is a reusable widget (no route, no page of its own) rather than a
+            // routed feature — any feature may compose it, same as shared/core.
+            {
+              from: { element: { type: 'features' } },
+              allow: {
+                to: { element: { type: 'features', captured: { feature: 'food-search' } } },
+              },
+            },
           ],
         },
       ],
