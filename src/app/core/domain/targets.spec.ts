@@ -1,6 +1,12 @@
 import type { UserProfile } from '../models/user-profile.model';
 import type { NutrientProfile } from '../models/nutrient-profile.model';
-import { computeAjrPercentages, computeBmr, computeTdee, DEFAULT_TARGETS } from './targets';
+import {
+  computeAjrPercentages,
+  computeBmr,
+  computePersonalizedTargets,
+  computeTdee,
+  DEFAULT_TARGETS,
+} from './targets';
 
 describe('DEFAULT_TARGETS', () => {
   it('matches the values from DailyTrainer_SPEC.md section 5.3', () => {
@@ -166,5 +172,69 @@ describe('computeAjrPercentages', () => {
     const percentages = computeAjrPercentages(totals, DEFAULT_TARGETS);
 
     expect(percentages.calcium_mg).toBeUndefined();
+  });
+});
+
+describe('computePersonalizedTargets', () => {
+  it('sets kcal to the profile TDEE and scales the other macro fields by the same ratio', () => {
+    // sedentary male, 70kg/175cm/30y: BMR = 700+1093.75-150+5 = 1648.75, TDEE = *1.2 = 1978.5
+    const profile: UserProfile = {
+      sex: 'male',
+      weightKg: 70,
+      heightCm: 175,
+      age: 30,
+      activityLevel: 'sedentary',
+    };
+    const tdee = computeTdee(profile);
+    const scale = tdee / DEFAULT_TARGETS.kcal;
+
+    const targets = computePersonalizedTargets(profile);
+
+    expect(targets.kcal).toBeCloseTo(tdee);
+    expect(targets.protein_g).toBeCloseTo(DEFAULT_TARGETS.protein_g * scale);
+    expect(targets.carbs_g).toBeCloseTo(DEFAULT_TARGETS.carbs_g * scale);
+    expect(targets.fat_g).toBeCloseTo(DEFAULT_TARGETS.fat_g * scale);
+    expect(targets.fiber_g).toBeCloseTo(DEFAULT_TARGETS.fiber_g * scale);
+  });
+
+  it('leaves micronutrient RDAs unchanged, since they do not scale with energy needs', () => {
+    const profile: UserProfile = {
+      sex: 'female',
+      weightKg: 60,
+      heightCm: 165,
+      age: 25,
+      activityLevel: 'active',
+    };
+
+    const targets = computePersonalizedTargets(profile);
+
+    expect(targets.vitaminC_mg).toBe(DEFAULT_TARGETS.vitaminC_mg);
+    expect(targets.vitaminA_mcg).toBe(DEFAULT_TARGETS.vitaminA_mcg);
+    expect(targets.calcium_mg).toBe(DEFAULT_TARGETS.calcium_mg);
+    expect(targets.iron_mg).toBe(DEFAULT_TARGETS.iron_mg);
+    expect(targets.sodium_mg).toBe(DEFAULT_TARGETS.sodium_mg);
+  });
+
+  it('scales against a custom base profile when one is given', () => {
+    const profile: UserProfile = {
+      sex: 'male',
+      weightKg: 70,
+      heightCm: 175,
+      age: 30,
+      activityLevel: 'sedentary',
+    };
+    const base: NutrientProfile = {
+      kcal: 1000,
+      protein_g: 50,
+      carbs_g: 100,
+      fat_g: 30,
+      fiber_g: 20,
+    };
+
+    const targets = computePersonalizedTargets(profile, base);
+
+    const tdee = computeTdee(profile);
+    expect(targets.kcal).toBeCloseTo(tdee);
+    expect(targets.protein_g).toBeCloseTo(50 * (tdee / 1000));
   });
 });

@@ -95,6 +95,26 @@ describe('DailyLogRepository', () => {
       expect(result).toEqual({ ok: true, value: undefined });
     });
 
+    it('merges just targets, leaving totals untouched, when totals is omitted', async () => {
+      setDocMock.mockResolvedValue(undefined);
+      const targets: NutrientProfile = {
+        kcal: 1978.5,
+        protein_g: 69,
+        carbs_g: 257,
+        fat_g: 69,
+        fiber_g: 30,
+      };
+
+      const result = await repository.upsert('2026-08-08', { targets });
+
+      expect(setDocMock).toHaveBeenCalledWith(
+        { withConverter: withConverterMock },
+        { date: '2026-08-08', targets },
+        { merge: true },
+      );
+      expect(result).toEqual({ ok: true, value: undefined });
+    });
+
     it('returns a Result error instead of throwing when the write fails', async () => {
       setDocMock.mockRejectedValue(new Error('offline'));
 

@@ -1,10 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { RouterLink } from '@angular/router';
 import { switchMap } from 'rxjs';
 
 import { DailyLogRepository } from '../../core/data-access/daily-log.repository';
@@ -33,6 +34,7 @@ function shiftDate(date: string, days: number): string {
 @Component({
   selector: 'dt-day-page',
   imports: [
+    RouterLink,
     MatToolbarModule,
     MatIconModule,
     MatButtonModule,
@@ -59,7 +61,8 @@ export class DayPage {
   );
 
   protected readonly newMealLabel = signal('');
-  protected readonly targets = DEFAULT_TARGETS;
+  // A day without a personalized targets.ts save yet (#32) falls back to the fixed AJR table.
+  protected readonly targets = computed(() => this.dailyLog()?.targets ?? DEFAULT_TARGETS);
 
   protected onDateInput(event: Event): void {
     this.selectedDate.set((event.target as HTMLInputElement).value);

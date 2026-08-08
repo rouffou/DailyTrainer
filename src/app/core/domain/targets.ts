@@ -37,6 +37,27 @@ export function computeTdee(profile: UserProfile): number {
   return computeBmr(profile) * ACTIVITY_MULTIPLIERS[profile.activityLevel];
 }
 
+// DailyTrainer_SPEC.md section 5.3's "aller plus loin qu'une table fixe" — scales the
+// energy/macro fields (kcal, protein_g, carbs_g, fat_g, fiber_g) of `base` to the profile's
+// TDEE, preserving their ratios to each other. Micronutrient RDAs (vitamins, minerals) are
+// copied unchanged: unlike energy needs, they don't scale with how much someone eats.
+export function computePersonalizedTargets(
+  profile: UserProfile,
+  base: NutrientProfile = DEFAULT_TARGETS,
+): NutrientProfile {
+  const tdee = computeTdee(profile);
+  const scale = tdee / base.kcal;
+
+  return {
+    ...base,
+    kcal: tdee,
+    protein_g: base.protein_g * scale,
+    carbs_g: base.carbs_g * scale,
+    fat_g: base.fat_g * scale,
+    fiber_g: base.fiber_g * scale,
+  };
+}
+
 // DailyTrainer_SPEC.md section 5.3 — "% des AJR atteint" = (totals.X / targets.X) * 100.
 // Only computed for nutrients actually present in totals, and skipped when the matching
 // target is missing or zero (nothing meaningful to compare against, and dividing by zero

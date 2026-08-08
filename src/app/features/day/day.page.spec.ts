@@ -1,11 +1,13 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
 import { DailyLogRepository } from '../../core/data-access/daily-log.repository';
 import { FoodRepository } from '../../core/data-access/food.repository';
 import { MealRepository } from '../../core/data-access/meal.repository';
+import { DEFAULT_TARGETS } from '../../core/domain/targets';
 import type { DailyLog } from '../../core/models/daily-log.model';
 import type { FoodSearchSelection } from '../../core/models/food-search-selection.model';
 import { DayPage } from './day.page';
@@ -30,6 +32,7 @@ describe('DayPage', () => {
       providers: [
         provideZonelessChangeDetection(),
         provideNoopAnimations(),
+        provideRouter([]),
         { provide: DailyLogRepository, useValue: dailyLogRepository },
         { provide: MealRepository, useValue: mealRepository },
         { provide: FoodRepository, useValue: foodRepository },
@@ -98,6 +101,30 @@ describe('DayPage', () => {
     await fixture.whenStable();
 
     expect(fixture.componentInstance['dailyLog']()).toEqual(dailyLog);
+  });
+
+  describe('targets', () => {
+    it('falls back to DEFAULT_TARGETS when the daily log has no personalized targets', () => {
+      expect(fixture.componentInstance['targets']()).toEqual(DEFAULT_TARGETS);
+    });
+
+    it("uses the daily log's targets when present (#32 personalized targets)", async () => {
+      const personalizedTargets = { ...DEFAULT_TARGETS, kcal: 1978.5 };
+      const dailyLog: DailyLog = {
+        id: '2030-05-05',
+        date: '2030-05-05',
+        meals: [],
+        totals: { kcal: 0, protein_g: 0, carbs_g: 0, fat_g: 0, fiber_g: 0 },
+        targets: personalizedTargets,
+      };
+      dailyLogRepository.get.mockReturnValue(of(dailyLog));
+
+      fixture.componentInstance['selectedDate'].set('2030-05-05');
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      expect(fixture.componentInstance['targets']()).toEqual(personalizedTargets);
+    });
   });
 
   describe('onCreateMeal', () => {

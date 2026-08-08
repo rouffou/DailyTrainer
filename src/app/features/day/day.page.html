@@ -12,6 +12,10 @@
   <button mat-icon-button (click)="goToToday()" aria-label="Aujourd'hui">
     <mat-icon>today</mat-icon>
   </button>
+
+  <a mat-icon-button routerLink="/settings" aria-label="Paramètres">
+    <mat-icon>settings</mat-icon>
+  </a>
 </mat-toolbar>
 
 <section class="meals">
@@ -36,7 +40,7 @@
 
   @if (dailyLog(); as log) {
     <dt-macro-chart [totals]="log.totals" />
-    <dt-micronutrient-chart [totals]="log.totals" [targets]="targets" />
-    <dt-nutrient-summary-table [totals]="log.totals" [targets]="targets" />
+    <dt-micronutrient-chart [totals]="log.totals" [targets]="targets()" />
+    <dt-nutrient-summary-table [totals]="log.totals" [targets]="targets()" />
   }
 </section>
