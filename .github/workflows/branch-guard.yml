@@ -1,0 +1,17 @@
+name: Branch Guard
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Only allow develop or hotfix branches to merge into main
+        run: |
+          HEAD_REF="${{ github.head_ref }}"
+          if [ "$HEAD_REF" != "develop" ] && [[ "$HEAD_REF" != hotfix/* ]]; then
+            echo "::error::Merges into main are only allowed from develop or hotfix/* (got '$HEAD_REF'). Merge into develop first."
+            exit 1
+          fi
