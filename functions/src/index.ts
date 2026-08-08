@@ -1,3 +1,2 @@
-// Cloud Functions entry point. Callable functions (searchFood, ...) and triggers
-// (recalcul des totals) sont ajoutés au fil des issues #17-19 et #23.
-export {};
+// Cloud Functions entry point. Triggers (recalcul des totals) are added in issue #23.
+export { searchFood } from './searchFood';
