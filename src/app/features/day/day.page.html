@@ -35,6 +35,7 @@
   </form>
 
   @if (dailyLog(); as log) {
+    <dt-macro-chart [totals]="log.totals" />
     <dt-nutrient-summary-table [totals]="log.totals" [targets]="targets" />
   }
 </section>
