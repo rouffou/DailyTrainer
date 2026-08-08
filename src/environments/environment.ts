@@ -6,11 +6,11 @@ import type { Environment } from './environment.model';
 export const environment: Environment = {
   production: false,
   firebase: {
-    apiKey: 'REPLACE_WITH_DEV_API_KEY',
+    apiKey: 'AIzaSyAu29kMH1W7N0L-LPW-7529dXRslDg2T4w',
     authDomain: 'dailytrainer-dev.firebaseapp.com',
     projectId: 'dailytrainer-dev',
-    storageBucket: 'dailytrainer-dev.appspot.com',
-    messagingSenderId: 'REPLACE_WITH_DEV_SENDER_ID',
-    appId: 'REPLACE_WITH_DEV_APP_ID',
+    storageBucket: 'dailytrainer-dev.firebasestorage.app',
+    messagingSenderId: '677303181599',
+    appId: '1:677303181599:web:62fb8b4f093782f05ad02a',
   },
 };
