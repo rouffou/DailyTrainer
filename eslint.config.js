@@ -7,7 +7,12 @@ const prettierConfig = require('eslint-config-prettier');
 
 module.exports = tseslint.config(
   {
-    ignores: ['dist/**', 'coverage/**', '.angular/**', 'functions/lib/**'],
+    // functions/ is a separate npm package with its own eslint.config.js, tsconfig.json, and
+    // `npm run lint` (added in #17) — it must stay out of this config's file glob entirely.
+    // Leaving it in only excludes functions/lib/** (build output) let typescript-eslint's
+    // project service see two candidate tsconfigRootDirs (root and functions/) once functions/
+    // had enough real files for the ambiguity to actually surface as a parsing error.
+    ignores: ['dist/**', 'coverage/**', '.angular/**', 'functions/**'],
   },
   {
     files: ['**/*.ts'],
