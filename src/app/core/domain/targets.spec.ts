@@ -1,5 +1,6 @@
 import type { UserProfile } from '../models/user-profile.model';
-import { computeBmr, computeTdee, DEFAULT_TARGETS } from './targets';
+import type { NutrientProfile } from '../models/nutrient-profile.model';
+import { computeAjrPercentages, computeBmr, computeTdee, DEFAULT_TARGETS } from './targets';
 
 describe('DEFAULT_TARGETS', () => {
   it('matches the values from DailyTrainer_SPEC.md section 5.3', () => {
@@ -103,5 +104,67 @@ describe('computeTdee', () => {
     };
 
     expect(computeTdee(profile)).toBeCloseTo(1648.75 * 1.9);
+  });
+});
+
+describe('computeAjrPercentages', () => {
+  it('computes (totals.X / targets.X) * 100 for each nutrient present in totals', () => {
+    const totals: NutrientProfile = {
+      kcal: 1000,
+      protein_g: 35,
+      carbs_g: 130,
+      fat_g: 35,
+      fiber_g: 15,
+    };
+
+    const percentages = computeAjrPercentages(totals, DEFAULT_TARGETS);
+
+    expect(percentages.kcal).toBeCloseTo(50);
+    expect(percentages.protein_g).toBeCloseTo(50);
+    expect(percentages.fiber_g).toBeCloseTo(50);
+  });
+
+  it('skips a nutrient when the matching target is missing', () => {
+    const totals: NutrientProfile = {
+      kcal: 1000,
+      protein_g: 35,
+      carbs_g: 130,
+      fat_g: 35,
+      fiber_g: 15,
+      zinc_mg: 5,
+    };
+
+    const percentages = computeAjrPercentages(totals, DEFAULT_TARGETS);
+
+    expect(percentages.zinc_mg).toBeUndefined();
+  });
+
+  it('skips a nutrient when the matching target is zero, to avoid dividing by zero', () => {
+    const totals: NutrientProfile = {
+      kcal: 1000,
+      protein_g: 35,
+      carbs_g: 130,
+      fat_g: 35,
+      fiber_g: 15,
+    };
+    const targets: NutrientProfile = { ...DEFAULT_TARGETS, kcal: 0 };
+
+    const percentages = computeAjrPercentages(totals, targets);
+
+    expect(percentages.kcal).toBeUndefined();
+  });
+
+  it('ignores a target for a nutrient absent from totals', () => {
+    const totals: NutrientProfile = {
+      kcal: 1000,
+      protein_g: 35,
+      carbs_g: 130,
+      fat_g: 35,
+      fiber_g: 15,
+    };
+
+    const percentages = computeAjrPercentages(totals, DEFAULT_TARGETS);
+
+    expect(percentages.calcium_mg).toBeUndefined();
   });
 });

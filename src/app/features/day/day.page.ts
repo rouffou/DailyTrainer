@@ -11,10 +11,12 @@ import { DailyLogRepository } from '../../core/data-access/daily-log.repository'
 import { FoodRepository } from '../../core/data-access/food.repository';
 import { MealRepository } from '../../core/data-access/meal.repository';
 import { computeNutrients } from '../../core/domain/nutrition-calc.service';
+import { DEFAULT_TARGETS } from '../../core/domain/targets';
 import type { Food } from '../../core/models/food.model';
 import type { FoodSearchSelection } from '../../core/models/food-search-selection.model';
 import { FoodSearchComponent } from '../food-search/food-search.component';
 import { MealCardComponent } from './components/meal-card/meal-card.component';
+import { NutrientSummaryTableComponent } from './components/nutrient-summary-table/nutrient-summary-table.component';
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -36,6 +38,7 @@ function shiftDate(date: string, days: number): string {
     MatInputModule,
     MealCardComponent,
     FoodSearchComponent,
+    NutrientSummaryTableComponent,
   ],
   templateUrl: './day.page.html',
   styleUrl: './day.page.css',
@@ -52,6 +55,7 @@ export class DayPage {
   );
 
   protected readonly newMealLabel = signal('');
+  protected readonly targets = DEFAULT_TARGETS;
 
   protected onDateInput(event: Event): void {
     this.selectedDate.set((event.target as HTMLInputElement).value);

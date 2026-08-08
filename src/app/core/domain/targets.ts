@@ -36,3 +36,25 @@ const ACTIVITY_MULTIPLIERS: Record<ActivityLevel, number> = {
 export function computeTdee(profile: UserProfile): number {
   return computeBmr(profile) * ACTIVITY_MULTIPLIERS[profile.activityLevel];
 }
+
+// DailyTrainer_SPEC.md section 5.3 — "% des AJR atteint" = (totals.X / targets.X) * 100.
+// Only computed for nutrients actually present in totals, and skipped when the matching
+// target is missing or zero (nothing meaningful to compare against, and dividing by zero
+// would produce Infinity).
+export function computeAjrPercentages(
+  totals: NutrientProfile,
+  targets: NutrientProfile,
+): Partial<Record<keyof NutrientProfile, number>> {
+  const percentages: Partial<Record<keyof NutrientProfile, number>> = {};
+
+  for (const key of Object.keys(totals) as Array<keyof NutrientProfile>) {
+    const value = totals[key];
+    const target = targets[key];
+    if (value === undefined || !target) {
+      continue;
+    }
+    percentages[key] = (value / target) * 100;
+  }
+
+  return percentages;
+}

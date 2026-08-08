@@ -33,4 +33,8 @@
     </mat-form-field>
     <button mat-flat-button type="submit">Ajouter un repas</button>
   </form>
+
+  @if (dailyLog(); as log) {
+    <dt-nutrient-summary-table [totals]="log.totals" [targets]="targets" />
+  }
 </section>
