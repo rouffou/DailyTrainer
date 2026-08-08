@@ -1,8 +1,9 @@
 name: Deploy
 
 on:
-  # Disabled until dailytrainer-prod exists and FIREBASE_SERVICE_ACCOUNT_PROD is set (issues
-  # #35-#37) — re-enable `push: branches: [main]` once real deploys should start happening.
+  push:
+    branches: [main]
+  # Manual re-run without a new commit, e.g. after fixing a deploy-only issue.
   workflow_dispatch: {}
 
 jobs:

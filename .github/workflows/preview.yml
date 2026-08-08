@@ -1,0 +1,42 @@
+name: PR Preview
+
+on:
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    # Forked PRs don't have access to repo secrets — skip rather than fail.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Build
+        run: npm run build
+
+      - name: Check deploy secret is configured
+        id: check_secret
+        run: echo "has_secret=${{ secrets.FIREBASE_SERVICE_ACCOUNT_DEV != '' }}" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy preview channel (dailytrainer-dev)
+        if: steps.check_secret.outputs.has_secret == 'true'
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/gcp-service-account.json
+        run: |
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_DEV }}' > "$GOOGLE_APPLICATION_CREDENTIALS"
+          npx firebase-tools hosting:channel:deploy "pr-${{ github.event.pull_request.number }}" \
+            --project dailytrainer-dev \
+            --expires 7d \
+            --non-interactive
+          rm -f "$GOOGLE_APPLICATION_CREDENTIALS"
