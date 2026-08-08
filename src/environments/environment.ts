@@ -11,6 +11,6 @@ export const environment: Environment = {
     projectId: 'dailytrainer-dev',
     storageBucket: 'dailytrainer-dev.appspot.com',
     messagingSenderId: 'REPLACE_WITH_DEV_SENDER_ID',
-    appId: 'REPLACE_WITH_DEV_APP_ID'
-  }
+    appId: 'REPLACE_WITH_DEV_APP_ID',
+  },
 };

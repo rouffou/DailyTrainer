@@ -11,6 +11,6 @@ export function provideFirebaseProviders(): EnvironmentProviders {
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideAuth(() => getAuth()),
     provideFirestore(() => getFirestore()),
-    provideFunctions(() => getFunctions())
+    provideFunctions(() => getFunctions()),
   ]);
 }
