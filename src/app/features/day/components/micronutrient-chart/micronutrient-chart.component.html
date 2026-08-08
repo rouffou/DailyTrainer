@@ -1,0 +1,16 @@
+@if (hasData()) {
+  <div class="chart-container">
+    <ngx-charts-bar-horizontal
+      [view]="[350, 250]"
+      [results]="series()"
+      [scheme]="scheme"
+      [xAxis]="true"
+      [yAxis]="true"
+      [showXAxisLabel]="true"
+      xAxisLabel="% des AJR"
+      [showDataLabel]="true"
+      [roundEdges]="false"
+      [animations]="false"
+    />
+  </div>
+}
