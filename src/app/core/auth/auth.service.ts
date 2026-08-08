@@ -15,7 +15,8 @@ import type { Result } from '../models/result.model';
 export class AuthService {
   private readonly auth = inject(Auth);
 
-  readonly currentUser = toSignal<User | null>(authState(this.auth), { initialValue: null });
+  readonly authState$ = authState(this.auth);
+  readonly currentUser = toSignal<User | null>(this.authState$, { initialValue: null });
 
   async signIn(email: string, password: string): Promise<Result<void>> {
     return this.run(() => signInWithEmailAndPassword(this.auth, email, password));
