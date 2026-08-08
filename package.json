@@ -16,7 +16,7 @@
     "src/**/*.ts": [
       "eslint --fix",
       "prettier --write",
-      "jest --bail --passWithNoTests --findRelatedTests"
+      "ng test --watch=false --pass-with-no-tests --find-related-tests"
     ],
     "src/**/*.html": [
       "prettier --write"
