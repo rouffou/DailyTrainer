@@ -1,36 +1,50 @@
-<form (submit)="$event.preventDefault(); onSubmit()">
-  <h1>Créer un compte</h1>
+<mat-card class="auth-card">
+  <mat-card-header>
+    <mat-card-title>Créer un compte</mat-card-title>
+  </mat-card-header>
 
-  <label>
-    Email
-    <input
-      type="email"
-      name="email"
-      autocomplete="email"
-      required
-      [value]="email()"
-      (input)="onEmailInput($event)"
-    />
-  </label>
+  <mat-card-content>
+    <form (submit)="$event.preventDefault(); onSubmit()">
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input
+          matInput
+          type="email"
+          name="email"
+          autocomplete="email"
+          required
+          [value]="email()"
+          (input)="onEmailInput($event)"
+        />
+      </mat-form-field>
 
-  <label>
-    Mot de passe
-    <input
-      type="password"
-      name="password"
-      autocomplete="new-password"
-      required
-      minlength="6"
-      [value]="password()"
-      (input)="onPasswordInput($event)"
-    />
-  </label>
+      <mat-form-field appearance="outline">
+        <mat-label>Mot de passe</mat-label>
+        <input
+          matInput
+          type="password"
+          name="password"
+          autocomplete="new-password"
+          required
+          minlength="6"
+          [value]="password()"
+          (input)="onPasswordInput($event)"
+        />
+      </mat-form-field>
 
-  @if (errorMessage()) {
-    <p role="alert">{{ errorMessage() }}</p>
-  }
+      @if (errorMessage()) {
+        <p class="error" role="alert">{{ errorMessage() }}</p>
+      }
 
-  <button type="submit" [disabled]="isSubmitting()">Créer mon compte</button>
+      <button mat-flat-button type="submit" [disabled]="isSubmitting()">
+        @if (isSubmitting()) {
+          <mat-spinner diameter="20" />
+        } @else {
+          Créer mon compte
+        }
+      </button>
 
-  <a routerLink="/login">J'ai déjà un compte</a>
-</form>
+      <a routerLink="/login">J'ai déjà un compte</a>
+    </form>
+  </mat-card-content>
+</mat-card>
