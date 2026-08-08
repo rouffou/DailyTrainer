@@ -1,6 +1,16 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { doc, docData, Firestore, setDoc } from '@angular/fire/firestore';
+import {
+  collection,
+  collectionData,
+  doc,
+  docData,
+  Firestore,
+  orderBy,
+  query,
+  setDoc,
+  where,
+} from '@angular/fire/firestore';
 import { of } from 'rxjs';
 
 import { AuthService } from '../auth/auth.service';
@@ -13,13 +23,21 @@ const withConverterMock = jest.fn(() => 'DOC_REF');
 
 jest.mock('@angular/fire/firestore', () => ({
   Firestore: class Firestore {},
+  collection: jest.fn(() => ({ withConverter: withConverterMock })),
+  collectionData: jest.fn(),
   doc: jest.fn(() => ({ withConverter: withConverterMock })),
   docData: jest.fn(),
+  orderBy: jest.fn((...args: unknown[]) => ({ orderBy: args })),
+  query: jest.fn(() => 'QUERY'),
   setDoc: jest.fn(),
+  where: jest.fn((...args: unknown[]) => ({ where: args })),
 }));
 
+const collectionMock = jest.mocked(collection);
+const collectionDataMock = jest.mocked(collectionData);
 const docMock = jest.mocked(doc);
 const docDataMock = jest.mocked(docData);
+const queryMock = jest.mocked(query);
 const setDocMock = jest.mocked(setDoc);
 
 describe('DailyLogRepository', () => {
@@ -71,6 +89,43 @@ describe('DailyLogRepository', () => {
         expect(mealRepository.getMeals).toHaveBeenCalledWith('2026-08-08');
         done();
       });
+    });
+  });
+
+  describe('getRange', () => {
+    it('queries users/{uid}/dailyLogs with a date range, ordered by date', () => {
+      collectionDataMock.mockReturnValue(of([]));
+
+      repository.getRange('2026-08-01', '2026-08-08');
+
+      expect(collectionMock).toHaveBeenCalledWith({}, 'users/alice/dailyLogs');
+      expect(where).toHaveBeenNthCalledWith(1, 'date', '>=', '2026-08-01');
+      expect(where).toHaveBeenNthCalledWith(2, 'date', '<=', '2026-08-08');
+      expect(orderBy).toHaveBeenCalledWith('date');
+      expect(queryMock).toHaveBeenCalledWith(
+        'DOC_REF',
+        { where: ['date', '>=', '2026-08-01'] },
+        { where: ['date', '<=', '2026-08-08'] },
+        { orderBy: ['date'] },
+      );
+    });
+
+    it('returns the documents in range, requesting the document id via idField', async () => {
+      const docs = [
+        {
+          id: '2026-08-01',
+          date: '2026-08-01',
+          totals: { kcal: 100, protein_g: 10, carbs_g: 5, fat_g: 2, fiber_g: 1 },
+        },
+      ];
+      collectionDataMock.mockReturnValue(of(docs));
+
+      const result = await new Promise((resolve) => {
+        repository.getRange('2026-08-01', '2026-08-08').subscribe(resolve);
+      });
+
+      expect(result).toEqual(docs);
+      expect(collectionDataMock).toHaveBeenCalledWith('QUERY', { idField: 'id' });
     });
   });
 

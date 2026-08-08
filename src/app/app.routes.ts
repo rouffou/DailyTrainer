@@ -26,4 +26,9 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./features/settings/settings.page').then((m) => m.SettingsPage),
   },
+  {
+    path: 'history',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/history/history.page').then((m) => m.HistoryPage),
+  },
 ];
