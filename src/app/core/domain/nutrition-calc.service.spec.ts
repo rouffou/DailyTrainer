@@ -1,23 +1,15 @@
-import type { Food } from '../models/food.model';
 import type { NutrientProfile } from '../models/nutrient-profile.model';
-import { aggregateTotals, computeNutrients } from './nutrition-calc.service';
-
-function makeFood(per100g: Food['per100g']): Food {
-  return {
-    id: 'food1',
-    name: 'Test food',
-    source: 'local',
-    per100g,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Timestamp isn't relevant to computeNutrients, and importing firebase/firestore's real type just for this test double isn't worth the coupling.
-    createdAt: {} as any,
-  };
-}
+import {
+  aggregateTotals,
+  computeMacroDistribution,
+  computeNutrients,
+} from './nutrition-calc.service';
 
 describe('computeNutrients', () => {
   it('scales required fields by quantity_g / 100', () => {
-    const food = makeFood({ kcal: 200, protein_g: 20, carbs_g: 10, fat_g: 5, fiber_g: 2 });
+    const per100g = { kcal: 200, protein_g: 20, carbs_g: 10, fat_g: 5, fiber_g: 2 };
 
-    const result = computeNutrients(food, 150);
+    const result = computeNutrients(per100g, 150);
 
     expect(result).toEqual({ kcal: 300, protein_g: 30, carbs_g: 15, fat_g: 7.5, fiber_g: 3 });
   });
@@ -25,13 +17,13 @@ describe('computeNutrients', () => {
   it('returns the same values as per100g when quantity_g is 100', () => {
     const per100g = { kcal: 200, protein_g: 20, carbs_g: 10, fat_g: 5, fiber_g: 2 };
 
-    expect(computeNutrients(makeFood(per100g), 100)).toEqual(per100g);
+    expect(computeNutrients(per100g, 100)).toEqual(per100g);
   });
 
   it('returns all zeros when quantity_g is 0', () => {
-    const food = makeFood({ kcal: 200, protein_g: 20, carbs_g: 10, fat_g: 5, fiber_g: 2 });
+    const per100g = { kcal: 200, protein_g: 20, carbs_g: 10, fat_g: 5, fiber_g: 2 };
 
-    expect(computeNutrients(food, 0)).toEqual({
+    expect(computeNutrients(per100g, 0)).toEqual({
       kcal: 0,
       protein_g: 0,
       carbs_g: 0,
@@ -41,7 +33,7 @@ describe('computeNutrients', () => {
   });
 
   it('scales optional micronutrients when present, and omits them when absent', () => {
-    const food = makeFood({
+    const per100g = {
       kcal: 100,
       protein_g: 10,
       carbs_g: 10,
@@ -49,9 +41,9 @@ describe('computeNutrients', () => {
       fiber_g: 1,
       vitaminC_mg: 80,
       iron_mg: 2,
-    });
+    };
 
-    const result = computeNutrients(food, 50);
+    const result = computeNutrients(per100g, 50);
 
     expect(result.vitaminC_mg).toBe(40);
     expect(result.iron_mg).toBe(1);
@@ -120,5 +112,38 @@ describe('aggregateTotals', () => {
 
     expect(result.vitaminC_mg).toBe(40);
     expect(result.calcium_mg).toBeUndefined();
+  });
+});
+
+describe('computeMacroDistribution', () => {
+  it('expresses each macro as a % of totals.kcal using Atwater factors (4/4/9)', () => {
+    // protein: 25g * 4 = 100 kcal, carbs: 150g * 4 = 600 kcal, fat: 33.33g * 9 = 300 kcal
+    const totals: NutrientProfile = {
+      kcal: 1000,
+      protein_g: 25,
+      carbs_g: 150,
+      fat_g: 100 / 3,
+      fiber_g: 10,
+    };
+
+    const distribution = computeMacroDistribution(totals);
+
+    expect(distribution).toEqual([
+      { label: 'Protéines', percentOfKcal: 10 },
+      { label: 'Glucides', percentOfKcal: 60 },
+      { label: 'Lipides', percentOfKcal: 30 },
+    ]);
+  });
+
+  it('returns all zeros when totals.kcal is zero, avoiding a division by zero', () => {
+    const totals: NutrientProfile = { kcal: 0, protein_g: 0, carbs_g: 0, fat_g: 0, fiber_g: 0 };
+
+    const distribution = computeMacroDistribution(totals);
+
+    expect(distribution).toEqual([
+      { label: 'Protéines', percentOfKcal: 0 },
+      { label: 'Glucides', percentOfKcal: 0 },
+      { label: 'Lipides', percentOfKcal: 0 },
+    ]);
   });
 });

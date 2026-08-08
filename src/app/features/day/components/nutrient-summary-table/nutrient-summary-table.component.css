@@ -1,0 +1,26 @@
+.nutrient-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+}
+
+.nutrient-table:last-child {
+  margin-bottom: 0;
+}
+
+.nutrient-table caption {
+  text-align: left;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.nutrient-table th,
+.nutrient-table td {
+  text-align: left;
+  padding: 0.4rem 0.75rem 0.4rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.nutrient-table th[scope='row'] {
+  font-weight: 400;
+}
