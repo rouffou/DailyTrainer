@@ -1,0 +1,35 @@
+<form (submit)="$event.preventDefault(); onSubmit()">
+  <h1>Connexion</h1>
+
+  <label>
+    Email
+    <input
+      type="email"
+      name="email"
+      autocomplete="email"
+      required
+      [value]="email()"
+      (input)="onEmailInput($event)"
+    />
+  </label>
+
+  <label>
+    Mot de passe
+    <input
+      type="password"
+      name="password"
+      autocomplete="current-password"
+      required
+      [value]="password()"
+      (input)="onPasswordInput($event)"
+    />
+  </label>
+
+  @if (errorMessage()) {
+    <p role="alert">{{ errorMessage() }}</p>
+  }
+
+  <button type="submit" [disabled]="isSubmitting()">Se connecter</button>
+
+  <a routerLink="/register">Créer un compte</a>
+</form>
