@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Locked down by default. Per-user access rules are defined in issue #9
+    // (DailyTrainer_SPEC.md section 4.3).
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

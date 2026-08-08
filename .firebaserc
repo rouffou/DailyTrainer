@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "dailytrainer-dev",
+    "dev": "dailytrainer-dev",
+    "prod": "dailytrainer-prod"
+  }
+}
