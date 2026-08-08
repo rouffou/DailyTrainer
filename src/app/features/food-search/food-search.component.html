@@ -1,0 +1,19 @@
+<mat-form-field appearance="outline" class="search-field">
+  <mat-label>Aliment</mat-label>
+  <input
+    matInput
+    type="text"
+    placeholder="100gr de bacon aldi"
+    [value]="query()"
+    (input)="onQueryInput($event)"
+    [matAutocomplete]="auto"
+  />
+</mat-form-field>
+
+<mat-autocomplete #auto="matAutocomplete" (optionSelected)="onOptionSelected($event)">
+  @for (candidate of candidates(); track candidate.source + candidate.name) {
+    <mat-option [value]="candidate">
+      {{ candidate.name }} — {{ candidate.per100g.kcal }} kcal/100g
+    </mat-option>
+  }
+</mat-autocomplete>
