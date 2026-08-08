@@ -8,9 +8,10 @@ jobs:
   guard:
     runs-on: ubuntu-latest
     steps:
-      - name: Only allow develop to merge into main
+      - name: Only allow develop or hotfix branches to merge into main
         run: |
-          if [ "${{ github.head_ref }}" != "develop" ]; then
-            echo "::error::Merges into main are only allowed from develop (got '${{ github.head_ref }}'). Merge into develop first."
+          HEAD_REF="${{ github.head_ref }}"
+          if [ "$HEAD_REF" != "develop" ] && [[ "$HEAD_REF" != hotfix/* ]]; then
+            echo "::error::Merges into main are only allowed from develop or hotfix/* (got '$HEAD_REF'). Merge into develop first."
             exit 1
           fi
