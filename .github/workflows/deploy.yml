@@ -1,0 +1,50 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  # Never deploy without re-running the exact same checks as CI — a merge commit
+  # could in principle differ from the last commit that was actually checked on the PR.
+  verify:
+    uses: ./.github/workflows/ci.yml
+
+  deploy:
+    needs: verify
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Install functions dependencies
+        working-directory: functions
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Build functions
+        working-directory: functions
+        run: npm run build
+
+      - name: Deploy to Firebase (dailytrainer-prod)
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/gcp-service-account.json
+        run: |
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_PROD }}' > "$GOOGLE_APPLICATION_CREDENTIALS"
+          npx firebase-tools deploy \
+            --only hosting,functions,firestore:rules \
+            --project dailytrainer-prod \
+            --non-interactive
+          rm -f "$GOOGLE_APPLICATION_CREDENTIALS"
