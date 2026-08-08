@@ -28,10 +28,15 @@
       <article class="meal">
         <dt-meal-card [meal]="meal" (deleteItem)="onDeleteItem(meal.id, $event)" />
         <dt-food-search (foodSelected)="onFoodSelected(meal.id, $event)" />
+        <dt-bulk-food-input (parsed)="onBulkAdd(meal.id, $event)" />
       </article>
     } @empty {
       <p class="empty-state">Aucun repas pour cette journée.</p>
     }
+  }
+
+  @if (bulkAddSummary(); as summary) {
+    <p class="bulk-summary">{{ summary }}</p>
   }
 
   <form class="new-meal" (submit)="$event.preventDefault(); onCreateMeal()">

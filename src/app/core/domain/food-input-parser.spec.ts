@@ -1,4 +1,4 @@
-import { parseFoodInput } from './food-input-parser';
+import { parseFoodInput, parseMultipleFoodInputs } from './food-input-parser';
 
 describe('parseFoodInput', () => {
   it('parses "quantity unit de name"', () => {
@@ -85,5 +85,46 @@ describe('parseFoodInput', () => {
 
   it('returns null for an empty string', () => {
     expect(parseFoodInput('')).toBeNull();
+  });
+});
+
+describe('parseMultipleFoodInputs', () => {
+  it('parses a comma-separated sentence into multiple entries', () => {
+    expect(parseMultipleFoodInputs('100gr de bacon aldi, 500gr de crudités')).toEqual([
+      { quantity: 100, unit: 'gr', name: 'bacon aldi' },
+      { quantity: 500, unit: 'gr', name: 'crudités' },
+    ]);
+  });
+
+  it('parses newline-separated entries from a multi-line textarea', () => {
+    expect(parseMultipleFoodInputs('100g de bacon\n2 œufs\n0,5kg de riz')).toEqual([
+      { quantity: 100, unit: 'g', name: 'bacon' },
+      { quantity: 2, unit: 'unité', name: 'œufs' },
+      { quantity: 0.5, unit: 'kg', name: 'riz' },
+    ]);
+  });
+
+  it('drops a segment that fails to parse instead of failing the whole batch', () => {
+    expect(parseMultipleFoodInputs('100g de bacon, pas une quantité valide, 2 œufs')).toEqual([
+      { quantity: 100, unit: 'g', name: 'bacon' },
+      { quantity: 2, unit: 'unité', name: 'œufs' },
+    ]);
+  });
+
+  it('ignores blank segments from trailing/consecutive separators', () => {
+    expect(parseMultipleFoodInputs('100g de bacon,,  \n, 2 œufs')).toEqual([
+      { quantity: 100, unit: 'g', name: 'bacon' },
+      { quantity: 2, unit: 'unité', name: 'œufs' },
+    ]);
+  });
+
+  it('returns an empty array for an empty string', () => {
+    expect(parseMultipleFoodInputs('')).toEqual([]);
+  });
+
+  it('returns a single-element array for a single valid entry', () => {
+    expect(parseMultipleFoodInputs('100g de bacon')).toEqual([
+      { quantity: 100, unit: 'g', name: 'bacon' },
+    ]);
   });
 });

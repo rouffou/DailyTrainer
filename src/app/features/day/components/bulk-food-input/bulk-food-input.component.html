@@ -1,0 +1,14 @@
+<form class="bulk-form" (submit)="$event.preventDefault(); onSubmit()">
+  <mat-form-field appearance="outline" class="bulk-field">
+    <mat-label>Saisie multiple</mat-label>
+    <textarea
+      matInput
+      rows="2"
+      placeholder="100gr de bacon aldi, 500gr de crudités, 2 œufs"
+      [value]="text()"
+      (input)="onTextInput($event)"
+    ></textarea>
+    <mat-hint>Séparez les aliments par une virgule ou un retour à la ligne</mat-hint>
+  </mat-form-field>
+  <button mat-flat-button type="submit">Ajouter tout</button>
+</form>
