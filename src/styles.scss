@@ -1,0 +1,119 @@
+@use '@angular/material' as mat;
+@use './styles/theme-colors' as theme;
+
+// DailyTrainer_CHARTE_GRAPHIQUE.md section 3 — Inter is the only typeface, titles included.
+$dt-font: 'Inter, sans-serif';
+
+html {
+  color-scheme: light dark;
+
+  @include mat.theme(
+    (
+      color: (
+        theme-type: light,
+        primary: theme.$primary-palette,
+        tertiary: theme.$tertiary-palette,
+      ),
+      typography: (
+        plain-family: $dt-font,
+        brand-family: $dt-font,
+      ),
+      density: 0,
+    )
+  );
+}
+
+// No manual light/dark toggle exists yet — this only follows the OS preference, which is
+// still real dark-mode support for anyone whose system is set to dark.
+@media (prefers-color-scheme: dark) {
+  html {
+    @include mat.theme(
+      (
+        color: (
+          theme-type: dark,
+          primary: theme.$primary-palette,
+          tertiary: theme.$tertiary-palette,
+        ),
+      )
+    );
+  }
+}
+
+:root {
+  // DailyTrainer_CHARTE_GRAPHIQUE.md section 2 — brand palette, kept as its own token set
+  // (rather than folded into Material's system tokens) because sections 2.4/2.6's macro and
+  // AJR-status colors are semantic and fixed: a macro's color must never depend on which
+  // Material theme happens to be active.
+  --dt-primary-50: #e6f5ef;
+  --dt-primary-100: #c0e8d8;
+  --dt-primary-300: #5fbe94;
+  --dt-primary-500: #1f7a5c;
+  --dt-primary-700: #145a43;
+  --dt-primary-900: #0a3327;
+
+  --dt-accent-100: #fde3d6;
+  --dt-accent-500: #f2723c;
+  --dt-accent-700: #c24b1c;
+
+  --dt-gray-50: #fafaf8;
+  --dt-gray-100: #f0efea;
+  --dt-gray-300: #d5d3c8;
+  --dt-gray-500: #8c8a80;
+  --dt-gray-700: #4a4944;
+  --dt-gray-900: #232220;
+
+  // Section 2.4 — macronutrients [fixed]
+  --dt-kcal: var(--dt-primary-500);
+  --dt-protein: #3d7dd8;
+  --dt-carbs: #e8a730;
+  --dt-fat: #8b5fbf;
+  --dt-fiber: #1d9e8f;
+
+  // Section 2.5 — micronutrients
+  --dt-vitamin: #5aa9e6;
+  --dt-mineral: #b9754a;
+
+  // Section 2.6 — AJR status [fixed]
+  --dt-status-under: #d5d3c8;
+  --dt-status-ok: #2e9e5b;
+  --dt-status-warn: #e8a730;
+  --dt-status-danger: #d64545;
+
+  // Section 4 — 8px spacing scale, no arbitrary values
+  --dt-space-1: 4px;
+  --dt-space-2: 8px;
+  --dt-space-3: 12px;
+  --dt-space-4: 16px;
+  --dt-space-6: 24px;
+  --dt-space-8: 32px;
+  --dt-space-12: 48px;
+  --dt-space-16: 64px;
+
+  // Section 5 — radii
+  --dt-radius-card: 12px;
+  --dt-radius-control: 8px;
+  --dt-radius-pill: 999px;
+}
+
+// Section 9 — dark-mode token overrides. Macro/status colors deliberately keep their exact
+// hue (only desaturated per the charte's own note) so a nutrient's color still reads as
+// "that nutrient" in the dark theme, not a different one.
+@media (prefers-color-scheme: dark) {
+  :root {
+    --dt-gray-50: #1c1b19;
+    --dt-gray-100: #2a2926;
+    --dt-gray-900: #f0efea;
+  }
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: Inter, sans-serif;
+  background: var(--dt-gray-50);
+  color: var(--dt-gray-900);
+}

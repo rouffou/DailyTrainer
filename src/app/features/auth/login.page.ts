@@ -7,6 +7,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Router, RouterLink } from '@angular/router';
 
 import { AuthService } from '../../core/auth/auth.service';
+import { LogoComponent } from '../../shared/ui/logo/logo.component';
 
 @Component({
   selector: 'dt-login-page',
@@ -17,6 +18,7 @@ import { AuthService } from '../../core/auth/auth.service';
     MatInputModule,
     MatButtonModule,
     MatProgressSpinnerModule,
+    LogoComponent,
   ],
   templateUrl: './login.page.html',
   styleUrl: './auth-form.css',
