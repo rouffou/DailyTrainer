@@ -1,4 +1,5 @@
 # DailyTrainer — Doctrine technique
+
 ## Architecture modulaire, clean code, conventions Angular
 
 > Ce document n'est pas une liste de suggestions. Toute PR qui viole une règle marquée **[BLOQUANT]** est rejetée sans discussion. Basé sur **Angular 22** (standalone par défaut, zoneless, signals, Signal Forms stables — juin 2026).
@@ -76,21 +77,21 @@ Un seul point d'entrée par collection racine (`FoodRepository`, `DailyLogReposi
 
 Basées sur le style guide officiel Angular + les évolutions stables d'Angular 22.
 
-| Sujet | Règle |
-|---|---|
-| Composants | **Standalone uniquement.** Aucun `NgModule` n'est créé, jamais. |
-| Change detection | **Zoneless** (`provideZonelessChangeDetection()`). Zone.js n'est pas une dépendance du projet. |
-| État réactif | **Signals** pour tout état local/dérivé de composant (`signal()`, `computed()`, `linkedSignal()`). RxJS réservé aux flux asynchrones réels (Firestore `onSnapshot`, debounce de recherche) — converti en signal via `toSignal()` dès que possible, pas trimballé dans les templates. |
-| Formulaires | **Signal Forms** (stable en v22) pour tout nouveau formulaire. Reactive Forms classique interdit sur du code neuf. |
-| Injection de dépendances | `inject()` en haut de classe. Constructeur avec paramètres DI interdit sur du code neuf. |
-| Inputs/Outputs | API signal : `input()`, `input.required()`, `output()`. Décorateurs `@Input()`/`@Output()` interdits sur du code neuf. |
-| Templates | Nouvelle syntaxe de contrôle de flux : `@if`, `@for` (avec `track` obligatoire), `@switch`. `*ngIf`/`*ngFor` interdits. |
-| Nommage fichiers | `kebab-case`, suffixe explicite du type : `.page.ts`, `.component.ts`, `.repository.ts`, `.service.ts`, `.pipe.ts`, `.guard.ts` |
-| Nommage classes | `PascalCase` + suffixe correspondant : `DayPage`, `MealCardComponent`, `FoodRepository` |
-| Sélecteurs de composants | Préfixe `dt-` (DailyTrainer), kebab-case : `dt-meal-card` |
-| Un fichier = une entité exportée | Pas de fichier `utils.ts` fourre-tout. Pas de barrel `index.ts` qui ré-exporte tout un dossier (casse le tree-shaking et masque les dépendances réelles) |
-| Lazy loading | Chaque feature est chargée via `loadComponent`/`loadChildren` dans `app.routes.ts`. Aucune feature n'est importée en eager dans `app.config.ts`. |
-| Accessibilité | Angular Aria (stable v22) utilisé pour tout composant interactif custom (listbox d'autocomplete, etc.) |
+| Sujet                            | Règle                                                                                                                                                                                                                                                                                |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Composants                       | **Standalone uniquement.** Aucun `NgModule` n'est créé, jamais.                                                                                                                                                                                                                      |
+| Change detection                 | **Zoneless** (`provideZonelessChangeDetection()`). Zone.js n'est pas une dépendance du projet.                                                                                                                                                                                       |
+| État réactif                     | **Signals** pour tout état local/dérivé de composant (`signal()`, `computed()`, `linkedSignal()`). RxJS réservé aux flux asynchrones réels (Firestore `onSnapshot`, debounce de recherche) — converti en signal via `toSignal()` dès que possible, pas trimballé dans les templates. |
+| Formulaires                      | **Signal Forms** (stable en v22) pour tout nouveau formulaire. Reactive Forms classique interdit sur du code neuf.                                                                                                                                                                   |
+| Injection de dépendances         | `inject()` en haut de classe. Constructeur avec paramètres DI interdit sur du code neuf.                                                                                                                                                                                             |
+| Inputs/Outputs                   | API signal : `input()`, `input.required()`, `output()`. Décorateurs `@Input()`/`@Output()` interdits sur du code neuf.                                                                                                                                                               |
+| Templates                        | Nouvelle syntaxe de contrôle de flux : `@if`, `@for` (avec `track` obligatoire), `@switch`. `*ngIf`/`*ngFor` interdits.                                                                                                                                                              |
+| Nommage fichiers                 | `kebab-case`, suffixe explicite du type : `.page.ts`, `.component.ts`, `.repository.ts`, `.service.ts`, `.pipe.ts`, `.guard.ts`                                                                                                                                                      |
+| Nommage classes                  | `PascalCase` + suffixe correspondant : `DayPage`, `MealCardComponent`, `FoodRepository`                                                                                                                                                                                              |
+| Sélecteurs de composants         | Préfixe `dt-` (DailyTrainer), kebab-case : `dt-meal-card`                                                                                                                                                                                                                            |
+| Un fichier = une entité exportée | Pas de fichier `utils.ts` fourre-tout. Pas de barrel `index.ts` qui ré-exporte tout un dossier (casse le tree-shaking et masque les dépendances réelles)                                                                                                                             |
+| Lazy loading                     | Chaque feature est chargée via `loadComponent`/`loadChildren` dans `app.routes.ts`. Aucune feature n'est importée en eager dans `app.config.ts`.                                                                                                                                     |
+| Accessibilité                    | Angular Aria (stable v22) utilisé pour tout composant interactif custom (listbox d'autocomplete, etc.)                                                                                                                                                                               |
 
 ---
 
@@ -121,13 +122,13 @@ Basées sur le style guide officiel Angular + les évolutions stables d'Angular 
 
 ## 5. Tests **[BLOQUANT]**
 
-| Type | Cible | Outil |
-|---|---|---|
-| Unitaire | Tout `core/domain/*` (calculs, parsing, agrégation) — couverture **100%** exigée sur ce dossier | Jest (`ng test` configuré avec le builder Jest, pas Karma) |
-| Unitaire | `core/data-access/*` via émulateur Firestore | Jest + `@firebase/rules-unit-testing` |
-| Composant | Dumb components : rendu + interactions (`input`/`output`) | Angular Testing Library |
-| Règles de sécurité | `firestore.rules` testées explicitement (un user ne peut pas lire les données d'un autre `uid`) | `@firebase/rules-unit-testing` |
-| E2E | Parcours "saisir un repas → voir le récap" a minima | Playwright |
+| Type               | Cible                                                                                           | Outil                                                      |
+| ------------------ | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| Unitaire           | Tout `core/domain/*` (calculs, parsing, agrégation) — couverture **100%** exigée sur ce dossier | Jest (`ng test` configuré avec le builder Jest, pas Karma) |
+| Unitaire           | `core/data-access/*` via émulateur Firestore                                                    | Jest + `@firebase/rules-unit-testing`                      |
+| Composant          | Dumb components : rendu + interactions (`input`/`output`)                                       | Angular Testing Library                                    |
+| Règles de sécurité | `firestore.rules` testées explicitement (un user ne peut pas lire les données d'un autre `uid`) | `@firebase/rules-unit-testing`                             |
+| E2E                | Parcours "saisir un repas → voir le récap" a minima                                             | Playwright                                                 |
 
 Aucune PR touchant `core/domain` n'est mergée sans test associé — vérifié en CI, pas à l'œil.
 
@@ -180,7 +181,7 @@ Sur `main` (et `develop` si utilisée) :
 - **Branche à jour avant merge** (`Require branches to be up to date before merging`) pour éviter les merges sur du code obsolète
 - `Require conversation resolution before merging` : tous les commentaires de review doivent être résolus
 - **Interdiction du force-push et de la suppression** de `main`/`develop`
-- Merge strategy imposée : **squash and merge** uniquement (historique `main` linéaire, un commit = une PR)
+- Merge strategy imposée : **create a merge commit** uniquement, **squash désactivé**. Avec des PR empilées (une branche de feature créée par-dessus la précédente, non encore mergée), le squash réécrit le SHA du commit à chaque merge : toute branche construite dessus perd son ancêtre commun avec `main` et part en conflit — vécu en pratique sur ce repo. Le merge commit préserve les SHA d'origine, donc les branches empilées restent des descendants valides de `main` sans rebase manuel
 - Signature des commits recommandée (`Require signed commits`) si plusieurs contributeurs
 
 ### 8.3 Convention de commits et de PR
@@ -195,6 +196,7 @@ Sur `main` (et `develop` si utilisée) :
 Deux workflows minimum :
 
 **`ci.yml`** — déclenché sur toute PR vers `main`/`develop` :
+
 1. Install + cache des dépendances
 2. Lint (`eslint`, boundaries incluses)
 3. Typecheck (`tsc --noEmit`)
@@ -203,6 +205,7 @@ Deux workflows minimum :
 6. (Optionnel) Déploiement d'une preview Firebase Hosting par PR (`firebase hosting:channel:deploy pr-<number>`) pour review visuelle
 
 **`deploy.yml`** — déclenché sur merge dans `main` :
+
 1. Re-run des mêmes checks (jamais de déploiement sans re-vérification)
 2. `firebase deploy --only hosting,functions,firestore:rules` vers l'environnement de production
 3. Déploiement des Cloud Functions avec les secrets (clé USDA) injectés depuis GitHub Secrets / Firebase Functions secrets, jamais commités
