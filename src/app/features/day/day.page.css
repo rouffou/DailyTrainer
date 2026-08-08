@@ -1,0 +1,19 @@
+mat-toolbar {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.date-input {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 0.25rem;
+}
+
+.empty-state {
+  text-align: center;
+  margin-top: 2rem;
+  color: rgba(0, 0, 0, 0.6);
+}
