@@ -27,3 +27,21 @@ export function parseFoodInput(input: string): ParsedFoodInput | null {
     name: name!.trim(),
   };
 }
+
+// DailyTrainer_SPEC.md section 8 step 12 (Bonus V2) — "100gr de bacon aldi, 500gr de
+// crudités..." in one go. Splits on newlines (a multi-line textarea is as valid an input shape
+// as a single comma-separated sentence) and on commas, then reuses parseFoodInput per segment.
+// A comma is only treated as a separator when NOT immediately followed by a digit — French
+// decimal quantities ("0,5kg") use a comma with no surrounding space, while a list separator
+// is followed by whitespace (SPEC's own example: "..., 500gr..."), so this tells them apart
+// without needing to look ahead any further than the very next character.
+// A segment that doesn't parse (typo, stray punctuation) is silently dropped rather than
+// failing the whole batch — the caller only ever sees entries it can actually act on.
+export function parseMultipleFoodInputs(input: string): ParsedFoodInput[] {
+  return input
+    .split(/,(?!\d)|\n/)
+    .map((segment) => segment.trim())
+    .filter((segment) => segment.length > 0)
+    .map((segment) => parseFoodInput(segment))
+    .filter((parsed): parsed is ParsedFoodInput => parsed !== null);
+}

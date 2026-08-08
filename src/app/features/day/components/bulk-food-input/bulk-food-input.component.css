@@ -1,0 +1,9 @@
+.bulk-form {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.bulk-field {
+  flex: 1;
+}

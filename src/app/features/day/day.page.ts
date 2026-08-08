@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterLink } from '@angular/router';
-import { switchMap } from 'rxjs';
+import { firstValueFrom, switchMap } from 'rxjs';
 
 import { DailyLogRepository } from '../../core/data-access/daily-log.repository';
 import { FoodRepository } from '../../core/data-access/food.repository';
@@ -15,7 +15,9 @@ import { computeNutrients } from '../../core/domain/nutrition-calc.service';
 import { DEFAULT_TARGETS } from '../../core/domain/targets';
 import type { Food } from '../../core/models/food.model';
 import type { FoodSearchSelection } from '../../core/models/food-search-selection.model';
+import type { ParsedFoodInput } from '../../core/models/parsed-food-input.model';
 import { FoodSearchComponent } from '../food-search/food-search.component';
+import { BulkFoodInputComponent } from './components/bulk-food-input/bulk-food-input.component';
 import { MacroChartComponent } from './components/macro-chart/macro-chart.component';
 import { MealCardComponent } from './components/meal-card/meal-card.component';
 import { MicronutrientChartComponent } from './components/micronutrient-chart/micronutrient-chart.component';
@@ -42,6 +44,7 @@ function shiftDate(date: string, days: number): string {
     MatInputModule,
     MealCardComponent,
     FoodSearchComponent,
+    BulkFoodInputComponent,
     NutrientSummaryTableComponent,
     MacroChartComponent,
     MicronutrientChartComponent,
@@ -61,6 +64,7 @@ export class DayPage {
   );
 
   protected readonly newMealLabel = signal('');
+  protected readonly bulkAddSummary = signal<string | null>(null);
   // A day without a personalized targets.ts save yet (#32) falls back to the fixed AJR table.
   protected readonly targets = computed(() => this.dailyLog()?.targets ?? DEFAULT_TARGETS);
 
@@ -111,6 +115,35 @@ export class DayPage {
 
   protected async onDeleteItem(mealId: string, itemId: string): Promise<void> {
     await this.mealRepository.deleteItem(this.selectedDate(), mealId, itemId);
+  }
+
+  // #38 (bonus) — "100gr de bacon aldi, 500gr de crudités..." parsed and resolved in one go.
+  // Only matches against the local cache (users/{uid}/foods): unlike the single-item flow
+  // (onFoodSelected), there's no per-entry UI to disambiguate an external searchFood result,
+  // so an entry with no local match is skipped rather than guessed at.
+  protected async onBulkAdd(mealId: string, entries: readonly ParsedFoodInput[]): Promise<void> {
+    let added = 0;
+    for (const entry of entries) {
+      const matches = await firstValueFrom(this.foodRepository.searchByNamePrefix(entry.name));
+      const food = matches[0];
+      if (!food) {
+        continue;
+      }
+      await this.mealRepository.addItem(this.selectedDate(), mealId, {
+        foodId: food.id,
+        foodName: food.name,
+        quantity_g: entry.quantity,
+        computed: computeNutrients(food.per100g, entry.quantity),
+      });
+      added++;
+    }
+
+    const skipped = entries.length - added;
+    this.bulkAddSummary.set(
+      skipped === 0
+        ? `${added} aliment(s) ajouté(s).`
+        : `${added} aliment(s) ajouté(s), ${skipped} non trouvé(s) dans le cache local.`,
+    );
   }
 
   // A FoodSearchResult (external, not yet in users/{uid}/foods) has no id — cache it first,

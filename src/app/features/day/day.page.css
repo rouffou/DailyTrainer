@@ -42,3 +42,8 @@ mat-toolbar {
 .new-meal mat-form-field {
   flex: 1;
 }
+
+.bulk-summary {
+  color: rgba(0, 0, 0, 0.6);
+  margin: 0;
+}

@@ -16,7 +16,7 @@ describe('DayPage', () => {
   let fixture: ComponentFixture<DayPage>;
   let dailyLogRepository: { get: jest.Mock };
   let mealRepository: { createMeal: jest.Mock; addItem: jest.Mock; deleteItem: jest.Mock };
-  let foodRepository: { save: jest.Mock };
+  let foodRepository: { save: jest.Mock; searchByNamePrefix: jest.Mock };
 
   beforeEach(async () => {
     dailyLogRepository = { get: jest.fn(() => of(undefined)) };
@@ -25,7 +25,10 @@ describe('DayPage', () => {
       addItem: jest.fn(async () => ({ ok: true, value: undefined })),
       deleteItem: jest.fn(async () => ({ ok: true, value: undefined })),
     };
-    foodRepository = { save: jest.fn(async () => ({ ok: true, value: undefined })) };
+    foodRepository = {
+      save: jest.fn(async () => ({ ok: true, value: undefined })),
+      searchByNamePrefix: jest.fn(() => of([])),
+    };
 
     await TestBed.configureTestingModule({
       imports: [DayPage],
@@ -233,6 +236,49 @@ describe('DayPage', () => {
       await fixture.componentInstance['onDeleteItem']('meal-1', 'item-1');
 
       expect(mealRepository.deleteItem).toHaveBeenCalledWith('2026-01-01', 'meal-1', 'item-1');
+    });
+  });
+
+  describe('onBulkAdd', () => {
+    it('adds an item for each entry with a local cache match', async () => {
+      fixture.componentInstance['selectedDate'].set('2026-01-01');
+      foodRepository.searchByNamePrefix.mockImplementation((name: string) =>
+        of(
+          name === 'bacon'
+            ? [
+                {
+                  id: 'food-1',
+                  name: 'bacon',
+                  per100g: { kcal: 300, protein_g: 25, carbs_g: 1, fat_g: 22, fiber_g: 0 },
+                },
+              ]
+            : [],
+        ),
+      );
+
+      await fixture.componentInstance['onBulkAdd']('meal-1', [
+        { quantity: 100, unit: 'g', name: 'bacon' },
+      ]);
+
+      expect(mealRepository.addItem).toHaveBeenCalledWith(
+        '2026-01-01',
+        'meal-1',
+        expect.objectContaining({ foodId: 'food-1', foodName: 'bacon', quantity_g: 100 }),
+      );
+      expect(fixture.componentInstance['bulkAddSummary']()).toBe('1 aliment(s) ajouté(s).');
+    });
+
+    it('skips an entry with no local cache match and reports it in the summary', async () => {
+      foodRepository.searchByNamePrefix.mockReturnValue(of([]));
+
+      await fixture.componentInstance['onBulkAdd']('meal-1', [
+        { quantity: 100, unit: 'g', name: 'inconnu' },
+      ]);
+
+      expect(mealRepository.addItem).not.toHaveBeenCalled();
+      expect(fixture.componentInstance['bulkAddSummary']()).toBe(
+        '0 aliment(s) ajouté(s), 1 non trouvé(s) dans le cache local.',
+      );
     });
   });
 });
