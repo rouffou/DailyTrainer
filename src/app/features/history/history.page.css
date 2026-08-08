@@ -1,0 +1,33 @@
+mat-toolbar {
+  display: flex;
+  justify-content: center;
+}
+
+.history {
+  max-width: 32rem;
+  margin: 1rem auto;
+  padding: 0 1rem;
+}
+
+.range-form {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.history-table th,
+.history-table td {
+  text-align: left;
+  padding: 0.4rem 0.75rem 0.4rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.empty-state {
+  text-align: center;
+  color: rgba(0, 0, 0, 0.6);
+}

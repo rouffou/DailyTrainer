@@ -1,0 +1,38 @@
+<mat-toolbar color="primary">
+  <span>Historique</span>
+</mat-toolbar>
+
+<section class="history">
+  <form class="range-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Du</mat-label>
+      <input matInput type="date" [value]="fromDate()" (change)="onFromDateInput($event)" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Au</mat-label>
+      <input matInput type="date" [value]="toDate()" (change)="onToDateInput($event)" />
+    </mat-form-field>
+  </form>
+
+  @if (dailyLogs().length > 0) {
+    <table class="history-table">
+      <thead>
+        <tr>
+          <th scope="col">Date</th>
+          <th scope="col">Calories</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (log of dailyLogs(); track log.id) {
+          <tr>
+            <td>{{ log.date }}</td>
+            <td>{{ log.totals.kcal }} kcal</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  } @else {
+    <p class="empty-state">Aucune donnée pour cette période.</p>
+  }
+</section>

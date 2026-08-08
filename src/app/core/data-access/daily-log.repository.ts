@@ -1,10 +1,15 @@
 import { Injectable, inject } from '@angular/core';
 import {
+  collection,
+  collectionData,
   doc,
   docData,
   Firestore,
   FirestoreDataConverter,
+  orderBy,
+  query,
   setDoc,
+  where,
   WithFieldValue,
 } from '@angular/fire/firestore';
 import { combineLatest, map, Observable } from 'rxjs';
@@ -15,7 +20,10 @@ import type { NutrientProfile } from '../models/nutrient-profile.model';
 import type { Result } from '../models/result.model';
 import { MealRepository } from './meal.repository';
 
-type DailyLogDocument = Omit<DailyLog, 'meals'>;
+// meals (and their items) live in subcollections MealRepository owns — a range query returns
+// this lighter shape rather than a full DailyLog, so features/history isn't forced to fan out
+// a getMeals() call per day in the range just to show a totals-over-time curve (#34).
+export type DailyLogDocument = Omit<DailyLog, 'meals'>;
 
 const dailyLogDocConverter: FirestoreDataConverter<DailyLogDocument> = {
   toFirestore(dailyLog: WithFieldValue<DailyLogDocument>): WithFieldValue<DailyLogDocument> {
@@ -47,6 +55,21 @@ export class DailyLogRepository {
     return combineLatest([dailyLogDoc$, this.mealRepository.getMeals(date)]).pipe(
       map(([dailyLogDoc, meals]) => (dailyLogDoc ? { ...dailyLogDoc, meals } : undefined)),
     );
+  }
+
+  // DailyTrainer_SPEC.md section 6 — where('date', '>=', from).where('date', '<=', to), for
+  // features/history's evolution chart (#33/#34). Both bounds are on `date`, and orderBy is on
+  // that same field, so this only needs Firestore's automatic single-field index — no entry in
+  // firestore.indexes.json required.
+  getRange(fromDate: string, toDate: string): Observable<DailyLogDocument[]> {
+    const uid = this.requireUid();
+    const rangeQuery = query(
+      collection(this.firestore, `users/${uid}/dailyLogs`).withConverter(dailyLogDocConverter),
+      where('date', '>=', fromDate),
+      where('date', '<=', toDate),
+      orderBy('date'),
+    );
+    return collectionData<DailyLogDocument, 'id'>(rangeQuery, { idField: 'id' });
   }
 
   async upsert(
