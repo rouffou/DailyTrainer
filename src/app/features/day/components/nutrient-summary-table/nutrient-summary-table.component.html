@@ -1,0 +1,65 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Récapitulatif journalier</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <table class="nutrient-table">
+      <caption>
+        Macronutriments
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">Nutriment</th>
+          <th scope="col">Valeur</th>
+          <th scope="col">Objectif</th>
+          <th scope="col">% AJR</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of macroRows(); track row.key) {
+          <tr>
+            <th scope="row">{{ row.label }}</th>
+            <td>{{ row.value | number: '1.0-1' }} {{ row.unit }}</td>
+            <td>
+              {{ row.target !== undefined ? (row.target | number: '1.0-1') + ' ' + row.unit : '—' }}
+            </td>
+            <td>{{ row.percent !== undefined ? (row.percent | number: '1.0-0') + ' %' : '—' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    @if (microRows().length > 0) {
+      <table class="nutrient-table">
+        <caption>
+          Micronutriments
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Nutriment</th>
+            <th scope="col">Valeur</th>
+            <th scope="col">Objectif</th>
+            <th scope="col">% AJR</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of microRows(); track row.key) {
+            <tr>
+              <th scope="row">{{ row.label }}</th>
+              <td>{{ row.value | number: '1.0-1' }} {{ row.unit }}</td>
+              <td>
+                {{
+                  row.target !== undefined ? (row.target | number: '1.0-1') + ' ' + row.unit : '—'
+                }}
+              </td>
+              <td>
+                {{ row.percent !== undefined ? (row.percent | number: '1.0-0') + ' %' : '—' }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </mat-card-content>
+</mat-card>
