@@ -14,15 +14,23 @@
   </button>
 </mat-toolbar>
 
-@if (dailyLog(); as log) {
-  <mat-nav-list>
+<section class="meals">
+  @if (dailyLog(); as log) {
     @for (meal of log.meals; track meal.id) {
-      <mat-list-item>
-        <span matListItemTitle>{{ meal.label }}</span>
-        <span matListItemLine>{{ meal.totals.kcal }} kcal</span>
-      </mat-list-item>
+      <article class="meal">
+        <dt-meal-card [meal]="meal" (deleteItem)="onDeleteItem(meal.id, $event)" />
+        <dt-food-search (foodSelected)="onFoodSelected(meal.id, $event)" />
+      </article>
+    } @empty {
+      <p class="empty-state">Aucun repas pour cette journée.</p>
     }
-  </mat-nav-list>
-} @else {
-  <p class="empty-state">Aucune donnée pour cette journée.</p>
-}
+  }
+
+  <form class="new-meal" (submit)="$event.preventDefault(); onCreateMeal()">
+    <mat-form-field appearance="outline">
+      <mat-label>Nouveau repas</mat-label>
+      <input matInput [value]="newMealLabel()" (input)="onNewMealLabelInput($event)" />
+    </mat-form-field>
+    <button mat-flat-button type="submit">Ajouter un repas</button>
+  </form>
+</section>
