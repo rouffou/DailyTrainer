@@ -1,0 +1,36 @@
+<form (submit)="$event.preventDefault(); onSubmit()">
+  <h1>Créer un compte</h1>
+
+  <label>
+    Email
+    <input
+      type="email"
+      name="email"
+      autocomplete="email"
+      required
+      [value]="email()"
+      (input)="onEmailInput($event)"
+    />
+  </label>
+
+  <label>
+    Mot de passe
+    <input
+      type="password"
+      name="password"
+      autocomplete="new-password"
+      required
+      minlength="6"
+      [value]="password()"
+      (input)="onPasswordInput($event)"
+    />
+  </label>
+
+  @if (errorMessage()) {
+    <p role="alert">{{ errorMessage() }}</p>
+  }
+
+  <button type="submit" [disabled]="isSubmitting()">Créer mon compte</button>
+
+  <a routerLink="/login">J'ai déjà un compte</a>
+</form>
