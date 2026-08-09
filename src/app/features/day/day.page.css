@@ -15,7 +15,7 @@ mat-toolbar {
 .empty-state {
   text-align: center;
   margin-top: 2rem;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--dt-gray-700);
 }
 
 .meals {
@@ -44,6 +44,6 @@ mat-toolbar {
 }
 
 .bulk-summary {
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--dt-gray-700);
   margin: 0;
 }

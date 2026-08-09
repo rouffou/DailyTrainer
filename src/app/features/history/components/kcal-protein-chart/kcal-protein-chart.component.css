@@ -5,5 +5,5 @@
 
 .empty-state {
   text-align: center;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--dt-gray-700);
 }
