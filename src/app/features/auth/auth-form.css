@@ -28,3 +28,25 @@ a {
   align-self: center;
   margin-top: 0.5rem;
 }
+
+.social-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--dt-gray-500, rgba(0, 0, 0, 0.5));
+  margin: 1rem 0;
+}
+
+.social-divider::before,
+.social-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--dt-gray-300, rgba(0, 0, 0, 0.12));
+}
+
+.social-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}

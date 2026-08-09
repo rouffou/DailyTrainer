@@ -7,6 +7,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Router, RouterLink } from '@angular/router';
 
 import { AuthService } from '../../core/auth/auth.service';
+import type { Result } from '../../core/models/result.model';
 import { LogoComponent } from '../../shared/ui/logo/logo.component';
 
 @Component({
@@ -41,10 +42,22 @@ export class LoginPage {
   }
 
   protected async onSubmit(): Promise<void> {
+    await this.completeSignIn(() => this.authService.signIn(this.email(), this.password()));
+  }
+
+  protected async onGoogleSignIn(): Promise<void> {
+    await this.completeSignIn(() => this.authService.signInWithGoogle());
+  }
+
+  protected async onFacebookSignIn(): Promise<void> {
+    await this.completeSignIn(() => this.authService.signInWithFacebook());
+  }
+
+  private async completeSignIn(signIn: () => Promise<Result<void>>): Promise<void> {
     this.isSubmitting.set(true);
     this.errorMessage.set(null);
 
-    const result = await this.authService.signIn(this.email(), this.password());
+    const result = await signIn();
 
     this.isSubmitting.set(false);
     if (!result.ok) {
