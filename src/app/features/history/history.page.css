@@ -24,10 +24,10 @@ mat-toolbar {
 .history-table td {
   text-align: left;
   padding: 0.4rem 0.75rem 0.4rem 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  border-bottom: 1px solid var(--dt-gray-300);
 }
 
 .empty-state {
   text-align: center;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--dt-gray-700);
 }

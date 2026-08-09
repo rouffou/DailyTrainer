@@ -1,4 +1,4 @@
 .empty-state {
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--dt-gray-700);
   padding: 0 1rem;
 }
