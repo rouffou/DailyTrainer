@@ -1,24 +1,24 @@
 <mat-toolbar color="primary">
   <button mat-icon-button (click)="goToPreviousDay()" aria-label="Jour précédent">
-    <mat-icon>chevron_left</mat-icon>
+    <dt-icon name="chevron-left" />
   </button>
 
   <input class="date-input" type="date" [value]="selectedDate()" (change)="onDateInput($event)" />
 
   <button mat-icon-button (click)="goToNextDay()" aria-label="Jour suivant">
-    <mat-icon>chevron_right</mat-icon>
+    <dt-icon name="chevron-right" />
   </button>
 
   <button mat-icon-button (click)="goToToday()" aria-label="Aujourd'hui">
-    <mat-icon>today</mat-icon>
+    <dt-icon name="calendar" />
   </button>
 
   <a mat-icon-button routerLink="/history" aria-label="Historique">
-    <mat-icon>history</mat-icon>
+    <dt-icon name="history" />
   </a>
 
   <a mat-icon-button routerLink="/settings" aria-label="Paramètres">
-    <mat-icon>settings</mat-icon>
+    <dt-icon name="settings" />
   </a>
 </mat-toolbar>
 
