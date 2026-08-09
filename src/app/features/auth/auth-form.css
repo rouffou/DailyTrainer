@@ -50,3 +50,15 @@ a {
   flex-direction: column;
   gap: 0.5rem;
 }
+
+.social-button-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.social-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
