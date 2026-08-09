@@ -1,4 +1,5 @@
 import type { Environment } from './environment.model';
+import { usdaApiKey } from './environment.secrets';
 
 // Config publique du projet Firebase "dailytrainer-dev" (voir issue #35).
 // Publique par design (SDK Web) : la sécurité réelle vit dans firestore.rules,
@@ -13,4 +14,5 @@ export const environment: Environment = {
     messagingSenderId: '677303181599',
     appId: '1:677303181599:web:62fb8b4f093782f05ad02a',
   },
+  usdaApiKey,
 };
