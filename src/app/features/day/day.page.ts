@@ -2,7 +2,6 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterLink } from '@angular/router';
@@ -16,6 +15,7 @@ import { DEFAULT_TARGETS } from '../../core/domain/targets';
 import type { Food } from '../../core/models/food.model';
 import type { FoodSearchSelection } from '../../core/models/food-search-selection.model';
 import type { ParsedFoodInput } from '../../core/models/parsed-food-input.model';
+import { IconComponent } from '../../shared/ui/icon/icon.component';
 import { FoodSearchComponent } from '../food-search/food-search.component';
 import { BulkFoodInputComponent } from './components/bulk-food-input/bulk-food-input.component';
 import { MacroChartComponent } from './components/macro-chart/macro-chart.component';
@@ -38,7 +38,7 @@ function shiftDate(date: string, days: number): string {
   imports: [
     RouterLink,
     MatToolbarModule,
-    MatIconModule,
+    IconComponent,
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
