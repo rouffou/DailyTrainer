@@ -29,6 +29,9 @@ jobs:
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
+      - name: Create local secrets placeholder
+        run: cp src/environments/environment.secrets.example.ts src/environments/environment.secrets.ts
+
       - name: Scan for secrets
         uses: gitleaks/gitleaks-action@v2
         env:

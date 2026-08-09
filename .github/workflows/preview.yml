@@ -22,6 +22,14 @@ jobs:
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
+      - name: Create local secrets file
+        run: |
+          if [ -n "${{ secrets.USDA_API_KEY }}" ]; then
+            printf "export const usdaApiKey = '%s';\n" "${{ secrets.USDA_API_KEY }}" > src/environments/environment.secrets.ts
+          else
+            cp src/environments/environment.secrets.example.ts src/environments/environment.secrets.ts
+          fi
+
       - name: Build
         run: npm run build
 
